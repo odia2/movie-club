@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Movie Club</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f0a1a;--hd:#0a0612;--s1:#1b1428;--s2:#261d38;--line:#3a2f52;--tx:#f5f0ff;--mut:#a99fc0;--ac:#8b5cf6;--ac2:#b39bfa;--star:#f5c518;--ok:#4fd1b5}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--tx);font-family:Roboto,'Segoe UI',system-ui,sans-serif;min-height:100vh}
+button,input,select,textarea{font:inherit;color:inherit}button{cursor:pointer;border:0;background:none}a{color:var(--ac2)}
+:focus-visible{outline:2px solid var(--star);outline-offset:2px}
+.top{position:sticky;top:0;z-index:50;background:var(--hd);border-bottom:1px solid var(--line)}
+header{display:flex;align-items:center;gap:16px;padding:9px clamp(16px,4vw,48px)}
+.logo{background:var(--ac);color:#fff;font-weight:900;font-size:19px;padding:3px 10px;border-radius:5px;white-space:nowrap}
+.search{flex:1;max-width:620px;margin:0 auto;position:relative}
+.search input{width:100%;padding:10px 14px;background:#f3eeff;color:#1a1128;border:0;border-radius:6px}
+.results{position:absolute;top:calc(100% + 6px);left:0;right:0;background:var(--s1);border:1px solid var(--line);border-radius:8px;max-height:380px;overflow:auto;display:none}
+.res{display:flex;gap:12px;align-items:center;padding:10px 14px;cursor:pointer;border-bottom:1px solid var(--line)}.res:hover{background:var(--s2)}
+.res img{width:38px;height:56px;object-fit:cover;border-radius:3px;background:var(--s2)}.res small{color:var(--mut)}
+.user{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--mut)}
+.av{width:34px;height:34px;border-radius:50%;background:var(--ac);color:#fff;display:grid;place-items:center;font-weight:700;flex:none}
+.out{padding:7px 12px;border-radius:6px;background:var(--s1);font-size:13px}
+.nav{display:flex;gap:4px;padding:0 clamp(16px,4vw,48px);overflow-x:auto}
+.nav button{padding:11px 16px;color:var(--mut);font-weight:500;border-bottom:3px solid transparent;white-space:nowrap}
+.nav button.on{color:var(--tx);border-color:var(--ac)}
+main{padding:28px clamp(16px,4vw,48px) 60px;max-width:1360px;margin:0 auto}
+.sec{font-size:26px;font-weight:700;border-left:4px solid var(--ac);padding-left:12px;margin-bottom:18px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:1px;background:var(--line);border-radius:8px;overflow:hidden;margin-bottom:22px}
+.stat{background:var(--s1);padding:14px 16px;color:var(--mut);font-size:13px}.stat b{display:block;font-size:28px;color:var(--tx)}
+.stat.ok b{color:var(--ok)}.stat.gold b{color:var(--star)}
+.bar{display:flex;gap:10px;align-items:center;margin-bottom:22px;flex-wrap:wrap}
+.tabs{display:flex;gap:8px;overflow-x:auto;flex:1;padding-bottom:4px;scrollbar-width:none}
+.tab{padding:7px 14px;border-radius:999px;border:1px solid var(--line);white-space:nowrap;font-size:14px}.tab span{opacity:.6;margin-left:6px}
+.tab.on{background:var(--ac);border-color:var(--ac);color:#fff}
+select,.btn{padding:8px 14px;background:var(--s1);border:1px solid var(--line);border-radius:6px;font-size:14px}
+.btn:hover,select:hover{background:var(--s2)}.btn.red{background:var(--ac);border-color:var(--ac);color:#fff;font-weight:700}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px}
+.card{background:var(--s1);border-radius:8px;overflow:hidden;cursor:pointer;border:1px solid transparent}.card:hover{border-color:var(--line)}
+.pw{position:relative;aspect-ratio:2/3;background:var(--s2)}.pw img{width:100%;height:100%;object-fit:cover;display:block}
+.card.w .pw img{filter:saturate(.75) brightness(.9)}
+.bm{position:absolute;top:0;left:8px;width:28px;height:38px;background:var(--ac);clip-path:polygon(0 0,100% 0,100% 100%,50% 78%,0 100%)}
+.chk{position:absolute;top:8px;right:8px;width:24px;height:24px;border-radius:50%;background:var(--ok);color:#06231c;display:grid;place-items:center;font-size:13px;font-weight:800}
+.ci{padding:12px}.rt{display:flex;align-items:center;gap:5px;font-size:15px;font-weight:500}.rt.no{color:var(--mut);font-size:13px}
+.star{color:var(--star)}.hrt{color:#f43f5e}
+.tt{font-weight:500;font-size:16px;line-height:1.3;margin-top:3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.yr,.meta{color:var(--mut);font-size:13px}.meta{margin-bottom:10px}
+.empty{grid-column:1/-1;text-align:center;color:var(--mut);padding:60px 0}
+.post{display:flex;gap:14px;background:var(--s1);border-radius:8px;padding:14px;margin-bottom:10px;cursor:pointer}
+.vote{display:flex;flex-direction:column;align-items:center;min-width:32px}.vote button{color:var(--mut);font-size:16px}.vote button.on{color:var(--ac2)}
+.tagc{background:var(--s2);color:var(--ac2);padding:2px 9px;border-radius:999px;font-size:12px;font-weight:500}
+.pb h3{margin:8px 0 4px;font-size:18px}.pb p{color:#cfc6e3;font-size:14px;line-height:1.5;margin-bottom:6px}
+.mem{display:flex;align-items:center;gap:12px;background:var(--s1);border-radius:8px;padding:12px 14px;margin-bottom:8px}.nm{flex:1;cursor:pointer;font-weight:500}
+.back{position:fixed;inset:0;background:#000b;z-index:200;display:none;overflow-y:auto;padding:24px 12px}
+.sheet{position:relative;max-width:860px;margin:0 auto;background:var(--s1);border-radius:12px;overflow:hidden}
+.x{position:absolute;top:12px;right:14px;z-index:2;width:38px;height:38px;border-radius:50%;background:#000a;font-size:22px}
+.bd{height:170px;background:var(--s2) center/cover;position:relative}.bd:after{content:'';position:absolute;inset:0;background:linear-gradient(transparent 30%,var(--s1))}
+.mh{display:flex;gap:26px;padding:0 26px 26px;margin-top:-80px;position:relative}
+.mh>img{width:200px;height:300px;object-fit:cover;border-radius:8px;flex:none;background:var(--s2);box-shadow:0 12px 30px #000a}
+.mi{flex:1;padding-top:88px;min-width:0}.mi h2,.pad h2{font-size:28px;line-height:1.15;margin-bottom:6px}
+.over{line-height:1.6;font-size:15px;margin-bottom:14px}.row{display:flex;gap:10px;margin-bottom:12px}
+.box{background:var(--bg);border-radius:8px;padding:14px;margin-top:14px}.box h3{font-size:13px;color:var(--mut);margin-bottom:10px;font-weight:500}
+.tbx iframe{width:100%;aspect-ratio:16/9;border:0;border-radius:8px;margin-bottom:12px}
+.simr{display:flex;gap:8px;overflow-x:auto;margin:8px 0}.simr img{height:110px;border-radius:5px;cursor:pointer}
+input,textarea{width:100%;padding:10px 12px;background:var(--bg);border:1px solid var(--line);border-radius:6px;margin:4px 0}
+textarea{min-height:80px;resize:vertical}label.ck{display:flex;gap:8px;align-items:center;cursor:pointer;margin:8px 0}label.ck input{width:auto;accent-color:var(--ac);margin:0}
+.dlg{max-width:420px;margin:8vh auto;background:var(--s1);padding:26px;border-radius:12px}.dlg h2{margin-bottom:12px}
+.gap{display:flex;gap:10px;margin-top:14px}.gap>*{flex:1}.pad{padding:26px}.cmt{border-top:1px solid var(--line);padding:10px 0;font-size:14px}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--tx);color:var(--bg);padding:12px 20px;border-radius:8px;font-weight:600;z-index:400;transition:.25s;pointer-events:none}#toast.show{transform:translateX(-50%)}
+@media(max-width:640px){.user span{display:none}.mh{flex-direction:column;align-items:center;margin-top:-60px}.mi{padding-top:0;width:100%}.mh>img{width:140px;height:210px}.grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}}
+</style>
+</head>
+<body>
+<div class="back" id="auth" style="display:grid;place-items:center"><div class="dlg">
+<h2 id="at">Вхід</h2>
+<input id="an" placeholder="Ім'я, яке бачитимуть друзі" style="display:none">
+<input id="ae" type="email" placeholder="Email" autocomplete="username">
+<input id="ap" type="password" placeholder="Пароль (мінімум 6 символів)" autocomplete="current-password">
+<p class="meta" id="aerr" style="color:#f87171;margin:8px 0 0"></p>
+<div class="gap"><button class="btn red" id="ago">Увійти</button></div>
+<p class="meta" style="margin:14px 0 0"><a href="#" id="asw">Створити акаунт</a> · <a href="#" id="arst">Забули пароль?</a></p>
+</div></div>
+<div class="back" id="pend" style="place-items:center"><div class="dlg"><h2>Чекаємо підтвердження</h2><p class="meta">Адмін ще не підтвердив твій акаунт. Заходь пізніше.</p><div class="gap"><button class="btn" id="pout">Вийти</button></div></div></div>
+
+<div class="top">
+<header><div class="logo">MOVIE CLUB</div>
+<div class="search"><input id="q" placeholder="Знайти фільм або серіал…" autocomplete="off"><div class="results" id="results"></div></div>
+<div class="user"><span id="uname"></span><div class="av" id="uav"></div><button class="out" id="logout">Вийти</button></div></header>
+<nav class="nav"><button data-v="lib" class="on">Моя бібліотека</button><button data-v="disc">Відкрити</button><button data-v="com">Спільнота</button><button data-v="mem">Учасники</button></nav>
+</div>
+<main id="main"></main>
+<div class="back" id="ov"><div class="sheet" id="sh"></div></div>
+<div id="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+import { getFirestore, collection, doc, getDoc, getDocs, setDoc, addDoc, updateDoc, deleteDoc, query, orderBy, arrayUnion, arrayRemove, increment, writeBatch } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+const app = initializeApp({
+  apiKey: "AIzaSyCgkpCnK2QjMCE6HLwPBzJrnsaYRDr3YBc", authDomain: "wathed-movies.firebaseapp.com", projectId: "wathed-movies",
+  storageBucket: "wathed-movies.firebasestorage.app", messagingSenderId: "54824906865", appId: "1:54824906865:web:58f419a6824aae41f6abd0", measurementId: "G-K153BLFVSW"
+});
+const auth = getAuth(app), db = getFirestore(app);
+const TMDB = "e58d0bd8f6cdc8a3a80354d83e044fe4", ADMIN = "bogdan17261726@gmail.com", IMG = "https://image.tmdb.org/t/p/";
+const $ = s => document.querySelector(s), iso = () => new Date().toISOString();
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const tm = (p, q = '') => fetch(`https://api.themoviedb.org/3/${p}?api_key=${TMDB}&language=ru-RU${q}`).then(r => r.json());
+const eid = (t, id) => `${t || 'movie'}_${id}`, isM = e => !e.type || e.type === 'movie';
+const num = r => { const n = parseFloat(r); return !r || r === 'N/A' || isNaN(n) ? -1 : n; };
+const ratingStr = v => isNaN(parseFloat(v)) ? 'N/A' : `${parseFloat(v)}/10`;
+const ago = t => { const m = (Date.now() - new Date(t)) / 6e4; return m < 1 ? 'щойно' : m < 60 ? `${~~m} хв тому` : m < 1440 ? `${~~(m / 60)} год тому` : `${~~(m / 1440)} дн тому`; };
+const TABS = [['all','Всі'],['watched','Подивився'],['watchlist','Хочу подивитись'],['favorites','Улюблені'],['movie','Фільми'],['tv','Серіали']];
+const DSRC = [['trending/all/week','В тренді'],['movie/top_rated','Топ фільмів'],['tv/top_rated','Топ серіалів'],['movie/now_playing','Зараз у кіно']];
+const TAGS = ['Питання','Порада','Рецензія','Обговорення'];
+const inLib = (e, l) => l === 'all' || (l === 'watched' ? e.watched : l === 'movie' ? isM(e) : l === 'tv' ? e.type === 'tv' : !!e.libraries?.includes(l));
+let me, mine = [], lib = {}, view = 'lib', filter = 'all', sort = 'new', posts = [], tag = 'Усі', users = [], disc = [], dsrc = DSRC[0][0], tok = 0, trk = null, signup = false, nameHint = '';
+const isAd = () => me?.role === 'admin', own = () => lib.uid === me.uid;
+let tt; const toast = t => { const e = $('#toast'); e.textContent = t; e.classList.add('show'); clearTimeout(tt); tt = setTimeout(() => e.classList.remove('show'), 2400); };
+const sheet = h => { tok++; $('#sh').innerHTML = `<button class="x" id="mx">×</button>` + h; $('#ov').style.display = 'block'; document.body.style.overflow = 'hidden'; $('#mx').onclick = closeSheet; };
+const closeSheet = () => { tok++; $('#ov').style.display = 'none'; $('#sh').innerHTML = ''; document.body.style.overflow = ''; };
+$('#ov').onclick = e => e.target.id === 'ov' && closeSheet();
+document.addEventListener('keydown', e => e.key === 'Escape' && closeSheet());
+
+/* ---------- auth ---------- */
+$('#asw').onclick = e => { e.preventDefault(); signup = !signup; $('#at').textContent = signup ? 'Новий акаунт' : 'Вхід'; $('#ago').textContent = signup ? 'Зареєструватись' : 'Увійти'; $('#asw').textContent = signup ? 'Вже є акаунт? Увійти' : 'Створити акаунт'; $('#an').style.display = signup ? 'block' : 'none'; };
+$('#ago').onclick = async () => {
+  $('#aerr').textContent = '';
+  try {
+    nameHint = $('#an').value.trim();
+    if (signup) await createUserWithEmailAndPassword(auth, $('#ae').value, $('#ap').value);
+    else await signInWithEmailAndPassword(auth, $('#ae').value, $('#ap').value);
+  } catch (e) { $('#aerr').textContent = 'Помилка: ' + e.code.replace('auth/', ''); }
+};
+$('#arst').onclick = async e => { e.preventDefault(); if (!$('#ae').value) return $('#aerr').textContent = 'Спочатку введи email.'; try { await sendPasswordResetEmail(auth, $('#ae').value); toast('Лист для скидання пароля надіслано'); } catch (x) { $('#aerr').textContent = 'Помилка: ' + x.code; } };
+$('#logout').onclick = $('#pout').onclick = () => signOut(auth);
+onAuthStateChanged(auth, async u => {
+  if (!u) { me = null; $('#pend').style.display = 'none'; $('#auth').style.display = 'grid'; $('#main').innerHTML = ''; return; }
+  const ref = doc(db, 'users', u.uid); let s = await getDoc(ref);
+  if (!s.exists()) { const ad = u.email === ADMIN; await setDoc(ref, { email: u.email, name: nameHint || u.email.split('@')[0], role: ad ? 'admin' : 'member', approved: ad, createdAt: iso() }); s = await getDoc(ref); }
+  me = { uid: u.uid, ...s.data() }; $('#auth').style.display = 'none';
+  if (!me.approved) { $('#pend').style.display = 'grid'; return; }
+  $('#pend').style.display = 'none'; $('#uname').textContent = me.name; $('#uav').textContent = me.name[0].toUpperCase();
+  mine = await loadEntries(me.uid); lib = { uid: me.uid, name: me.name, entries: mine }; go('lib');
+});
+const loadEntries = async uid => (await getDocs(collection(db, 'users', uid, 'entries'))).docs.map(d => ({ id: d.id, ...d.data() }));
+
+/* ---------- navigation ---------- */
+document.querySelector('.nav').onclick = e => { const b = e.target.closest('[data-v]'); if (!b) return; if (b.dataset.v === 'lib') lib = { uid: me.uid, name: me.name, entries: mine }; go(b.dataset.v); };
+async function go(v) {
+  view = v; document.querySelectorAll('.nav button').forEach(b => b.classList.toggle('on', b.dataset.v === v));
+  $('#main').innerHTML = '<div class="empty">Завантаження…</div>';
+  try {
+    if (v === 'com') posts = (await getDocs(query(collection(db, 'posts'), orderBy('createdAt', 'desc')))).docs.map(d => ({ id: d.id, ...d.data() }));
+    if (v === 'mem') users = (await getDocs(collection(db, 'users'))).docs.map(d => ({ uid: d.id, ...d.data() }));
+    if (v === 'disc') { const d = await tm(dsrc); disc = d.results.filter(x => x.media_type !== 'person' && x.poster_path).map(x => mapT(x, dsrc.startsWith('trending') ? x.media_type : dsrc.split('/')[0])); }
+  } catch (e) { toast('Помилка завантаження: ' + e.message); }
+  render();
+}
+const mapT = (x, t) => ({ tmdb_id: String(x.id), type: t || x.media_type || 'movie', title: x.title || x.name, poster: x.poster_path ? IMG + 'w500' + x.poster_path : '', year: (x.release_date || x.first_air_date || '').slice(0, 4) || '—', vote: x.vote_average });
+const render = () => ({ lib: rLib, disc: rDisc, com: rCom, mem: rMem })[view]();
+const card = (e, attr, score) => {
+  const r = num(e.rating), has = mine.some(z => z.id === eid(e.type, e.tmdb_id)), wl = e.libraries?.includes('watchlist');
+  return `<article class="card ${e.watched || (attr.startsWith('data-tm') && has) ? 'w' : ''}" ${attr}><div class="pw"><img loading="lazy" src="${esc(e.poster)}" alt="">${wl ? '<span class="bm"></span>' : ''}${e.watched || (attr.startsWith('data-tm') && has) ? '<span class="chk">✓</span>' : ''}</div>
+<div class="ci"><div class="rt ${score || r >= 0 ? '' : 'no'}"><span class="star">${score || r >= 0 ? '★' : '☆'}</span>${score || (r >= 0 ? esc(e.rating.split('/')[0]) : 'Без оцінки')}${e.libraries?.includes('favorites') ? ' <span class="hrt">♥</span>' : ''}</div>
+<div class="tt">${esc(e.title)}</div><div class="yr">${esc(e.year)}${e.type === 'tv' ? ' · Серіал' : ''}</div></div></article>`;
+};
+
+/* ---------- library ---------- */
+function rLib() {
+  const E = lib.entries, f = {
+    new: (a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''), rd: (a, b) => num(b.rating) - num(a.rating), ra: (a, b) => num(a.rating) - num(b.rating),
+    yd: (a, b) => (b.year || 0) - (a.year || 0), ya: (a, b) => (a.year || 0) - (b.year || 0), t: (a, b) => (a.title || '').localeCompare(b.title || '')
+  }[sort], list = E.filter(e => inLib(e, filter)).sort(f), rated = E.map(e => num(e.rating)).filter(n => n > 0);
+  const st = [['Всього', E.length], ['Фільми', E.filter(isM).length], ['Серіали', E.filter(e => e.type === 'tv').length], ['Подивився', E.filter(e => e.watched).length, 'ok'], ['Середня оцінка', rated.length ? (rated.reduce((a, b) => a + b) / rated.length).toFixed(1) : '—', 'gold']];
+  $('#main').innerHTML = `<h1 class="sec">${own() ? 'Моя бібліотека' : 'Бібліотека: ' + esc(lib.name)}</h1>
+<div class="stats">${st.map(([n, v, c]) => `<div class="stat ${c || ''}">${n}<b>${v}</b></div>`).join('')}</div>
+<div class="bar"><div class="tabs">${TABS.map(([k, n]) => `<button class="tab ${k === filter ? 'on' : ''}" data-tab="${k}">${n}<span>${E.filter(e => inLib(e, k)).length}</span></button>`).join('')}</div>
+<select id="sort">${[['new','Спочатку нові'],['rd','Оцінка ↓'],['ra','Оцінка ↑'],['yd','Рік ↓'],['ya','Рік ↑'],['t','Назва А–Я']].map(([k, n]) => `<option value="${k}" ${k === sort ? 'selected' : ''}>${n}</option>`).join('')}</select>
+${own() && isAd() ? '<button class="btn" id="mig">⬇ Імпорт зі старої бази</button>' : ''}</div>
+<div class="grid">${list.length ? list.map(e => card(e, `data-i="${e.id}"`)).join('') : '<div class="empty">Тут поки порожньо. Знайди фільм у пошуку зверху або у вкладці «Відкрити».</div>'}</div>`;
+}
+async function migrate() {
+  if (!confirm('Скопіювати всі фільми зі старої колекції movies у твою бібліотеку?')) return;
+  try {
+    const s = await getDocs(collection(db, 'movies')), b = writeBatch(db); let n = 0;
+    s.docs.forEach(d => { const m = d.data(); if (!m.tmdb_id) return; const { addedBy, ...r } = m; b.set(doc(db, 'users', me.uid, 'entries', eid(m.type, m.tmdb_id)), { ...r, tmdb_id: String(m.tmdb_id), watched: m.watched === true, libraries: m.libraries || ['all'] }, { merge: true }); n++; });
+    await b.commit(); mine = await loadEntries(me.uid); lib.entries = mine; render(); toast(`Перенесено: ${n}`);
+  } catch (e) { toast('Помилка: ' + e.message); }
+}
+
+/* ---------- discover ---------- */
+function rDisc() {
+  $('#main').innerHTML = `<h1 class="sec">Відкрити</h1><div class="bar"><select id="dsrc">${DSRC.map(([k, n]) => `<option value="${k}" ${k === dsrc ? 'selected' : ''}>${n}</option>`).join('')}</select></div>
+<div class="grid">${disc.map((o, i) => card(o, `data-tm="${i}"`, (o.vote || 0).toFixed(1))).join('')}</div>`;
+}
+
+/* ---------- movie sheet ---------- */
+async function openMovie(o) {
+  const id = eid(o.type, o.tmdb_id), ex = mine.find(z => z.id === id), th = view === 'lib' && !own() ? lib.entries.find(z => z.id === id) : null, ep = o.type === 'tv' ? 'tv' : 'movie';
+  sheet(`<div class="bd" id="bd"></div><div class="mh"><img src="${esc(o.poster)}" alt=""><div class="mi"><h2>${esc(o.title)}</h2><p class="meta" id="mm">${esc(o.year)} · ${ep === 'tv' ? 'Серіал' : 'Фільм'}</p>
+<p class="over" id="mo">Завантаження…</p><p class="meta" id="mc"></p><div class="row"><button class="btn" id="tb">▶ Трейлер</button></div><div class="tbx" id="tbx"></div><div id="sim"></div>
+${th ? `<div class="box"><h3>Оцінка: ${esc(lib.name)}</h3><p>★ ${esc(th.rating || 'N/A')}</p><p class="over">${esc(th.comment || '')}</p></div>` : ''}
+<div class="box"><h3>Мій запис</h3>
+<label class="ck"><input type="checkbox" id="fw" ${ex?.watched ? 'checked' : ''}> Подивився</label>
+<input type="number" id="fr" min="0" max="13" step="0.1" placeholder="Моя оцінка з 10" value="${ex && num(ex.rating) >= 0 ? num(ex.rating) : ''}">
+<label class="ck"><input type="checkbox" id="fb" ${ex?.libraries?.includes('watchlist') ? 'checked' : ''}> Хочу подивитись</label>
+<label class="ck"><input type="checkbox" id="ff" ${ex?.libraries?.includes('favorites') ? 'checked' : ''}> Улюблений ♥</label>
+<textarea id="fc" placeholder="Мій коментар або рецензія">${esc(ex?.comment || '')}</textarea>
+<div class="gap"><button class="btn red" id="fs">Зберегти</button>${ex ? '<button class="btn" id="fd">Видалити</button>' : ''}</div></div></div></div>`);
+  const t = tok; trk = null;
+  $('#fw').onchange = e => { if (e.target.checked) $('#fb').checked = false; };
+  $('#tb').onclick = () => trk ? $('#tbx').innerHTML = `<iframe src="https://www.youtube.com/embed/${trk}?autoplay=1" allow="autoplay;fullscreen" allowfullscreen></iframe>` : toast('Трейлер не знайдено');
+  $('#fs').onclick = async () => {
+    try {
+      const l = ['all']; if ($('#fb').checked) l.push('watchlist'); if ($('#ff').checked) l.push('favorites'); const w = $('#fw').checked;
+      const data = { tmdb_id: String(o.tmdb_id), type: o.type, title: o.title, poster: o.poster, year: o.year, rating: ratingStr($('#fr').value), comment: $('#fc').value, watched: w, libraries: l, createdAt: ex?.createdAt || iso() };
+      if (w) data.watchedAt = ex?.watchedAt || iso();
+      await setDoc(doc(db, 'users', me.uid, 'entries', id), data);
+      mine = [...mine.filter(z => z.id !== id), { id, ...data }]; if (own()) lib.entries = mine;
+      closeSheet(); render(); toast('Збережено');
+    } catch (e) { toast('Помилка: ' + e.message); }
+  };
+  if (ex) $('#fd').onclick = async () => { if (!confirm('Видалити з бібліотеки?')) return; await deleteDoc(doc(db, 'users', me.uid, 'entries', id)); mine = mine.filter(z => z.id !== id); if (own()) lib.entries = mine; closeSheet(); render(); toast('Видалено'); };
+  try {
+    const d = await tm(`${ep}/${o.tmdb_id}`, '&append_to_response=videos,credits,similar'); if (t !== tok) return;
+    $('#mo').textContent = d.overview || 'Опис відсутній';
+    if (d.backdrop_path) $('#bd').style.backgroundImage = `url(${IMG}w780${d.backdrop_path})`;
+    const rt = d.runtime || d.episode_run_time?.[0];
+    $('#mm').innerHTML = `${esc(o.year)} · ${ep === 'tv' ? 'Серіал' : 'Фільм'}${rt ? ` · ${rt} хв` : ''} · <span class="star">★</span> ${(d.vote_average || 0).toFixed(1)} <small>(${d.vote_count} голосів)</small>`;
+    $('#mc').textContent = [d.genres?.map(g => g.name).join(', '), d.credits?.cast?.slice(0, 5).map(c => c.name).join(', ')].filter(Boolean).join(' — ');
+    trk = d.videos?.results?.find(v => v.type === 'Trailer' && v.site === 'YouTube')?.key || null;
+    const sims = (d.similar?.results || []).filter(s => s.poster_path).slice(0, 8);
+    if (sims.length) { $('#sim').innerHTML = `<p class="meta">Схожі</p><div class="simr">${sims.map((s, i) => `<img data-s="${i}" src="${IMG}w185${s.poster_path}" alt="${esc(s.title || s.name)}">`).join('')}</div>`; $('#sim').onclick = e => { const i = e.target.dataset.s; if (i !== undefined) openMovie(mapT(sims[i], ep)); }; }
+  } catch { if (t === tok) $('#mo').textContent = 'Не вдалося завантажити опис'; }
+}
+
+/* ---------- search ---------- */
+let st;
+$('#q').oninput = e => {
+  clearTimeout(st); const q = e.target.value.trim(), box = $('#results');
+  if (q.length < 2) return box.style.display = 'none';
+  st = setTimeout(async () => {
+    try {
+      const [a, b] = await Promise.all(['movie', 'tv'].map(t => tm(`search/${t}`, '&query=' + encodeURIComponent(q))));
+      const all = [...a.results.map(x => mapT(x, 'movie')), ...b.results.map(x => mapT(x, 'tv'))].sort((x, y) => (y.vote || 0) - (x.vote || 0)).slice(0, 8);
+      box.innerHTML = all.length ? '' : '<div class="res">Нічого не знайдено</div>';
+      all.forEach(o => { const el = document.createElement('div'); el.className = 'res'; el.innerHTML = `<img src="${esc(o.poster)}" alt=""><div><b>${esc(o.title)}</b><br><small>${o.type === 'tv' ? 'Серіал' : 'Фільм'}, ${o.year}</small></div>`; el.onclick = () => { box.style.display = 'none'; $('#q').value = ''; openMovie(o); }; box.appendChild(el); });
+      box.style.display = 'block';
+    } catch { toast('Пошук не спрацював'); }
+  }, 300);
+};
+document.addEventListener('click', e => { if (!e.target.closest('.search')) $('#results').style.display = 'none'; });
+
+/* ---------- community ---------- */
+function rCom() {
+  const list = posts.filter(p => tag === 'Усі' || p.tag === tag);
+  $('#main').innerHTML = `<h1 class="sec">Спільнота</h1><div class="bar"><div class="tabs">${['Усі', ...TAGS].map(t => `<button class="tab ${t === tag ? 'on' : ''}" data-tag="${t}">${t}</button>`).join('')}</div><button class="btn red" id="np">+ Новий пост</button></div>
+${list.length ? list.map(p => `<article class="post" data-p="${p.id}"><div class="vote"><button data-up="${p.id}" class="${p.up?.includes(me.uid) ? 'on' : ''}">▲</button><b>${p.up?.length || 0}</b></div>
+<div class="pb"><span class="tagc">${esc(p.tag)}</span><h3>${esc(p.title)}</h3><p>${esc((p.body || '').slice(0, 220))}</p><div class="meta">${esc(p.author)} · ${ago(p.createdAt)} · 💬 ${p.commentsCount || 0}</div></div></article>`).join('') : '<div class="empty">Тут ще тихо. Став перше питання або порадь фільм.</div>'}`;
+}
+async function vote(id) {
+  const p = posts.find(x => x.id === id), on = p.up?.includes(me.uid);
+  try { await updateDoc(doc(db, 'posts', id), { up: on ? arrayRemove(me.uid) : arrayUnion(me.uid) }); p.up = on ? p.up.filter(u => u !== me.uid) : [...(p.up || []), me.uid]; render(); } catch (e) { toast('Помилка: ' + e.message); }
+}
+function openNew() {
+  sheet(`<div class="pad"><h2>Новий пост</h2><select id="nt" style="margin:8px 0">${TAGS.map(t => `<option>${t}</option>`).join('')}</select><input id="ni" placeholder="Заголовок"><textarea id="nb" placeholder="Що хочеш обговорити?" style="min-height:140px"></textarea><div class="gap"><button class="btn red" id="ns">Опублікувати</button></div></div>`);
+  $('#ns').onclick = async () => {
+    const title = $('#ni').value.trim(); if (!title) return toast('Додай заголовок');
+    try { await addDoc(collection(db, 'posts'), { uid: me.uid, author: me.name, tag: $('#nt').value, title, body: $('#nb').value, up: [], commentsCount: 0, createdAt: iso() }); closeSheet(); go('com'); toast('Опубліковано'); } catch (e) { toast('Помилка: ' + e.message); }
+  };
+}
+async function openPost(id) {
+  const p = posts.find(x => x.id === id), can = o => isAd() || o === me.uid;
+  sheet(`<div class="pad"><span class="tagc">${esc(p.tag)}</span><h2 style="margin-top:8px">${esc(p.title)}</h2><p class="meta">${esc(p.author)} · ${ago(p.createdAt)}</p><p class="over" style="white-space:pre-wrap">${esc(p.body)}</p>
+${can(p.uid) ? '<button class="btn" id="dp">Видалити пост</button>' : ''}<p class="meta" style="margin-top:22px">Коментарі</p><div id="cl"></div><textarea id="cn" placeholder="Твій коментар"></textarea><div class="gap"><button class="btn red" id="cs">Надіслати</button></div></div>`);
+  const load = async () => {
+    const s = await getDocs(query(collection(db, 'posts', id, 'comments'), orderBy('createdAt')));
+    $('#cl').innerHTML = s.docs.length ? s.docs.map(d => { const c = d.data(); return `<div class="cmt"><div class="meta" style="margin-bottom:4px"><b>${esc(c.author)}</b> · ${ago(c.createdAt)}${can(c.uid) ? ` · <a href="#" data-dc="${d.id}">видалити</a>` : ''}</div>${esc(c.text)}</div>`; }).join('') : '<p class="meta">Поки немає коментарів. Напиши перший.</p>';
+  };
+  await load();
+  $('#cs').onclick = async () => { const text = $('#cn').value.trim(); if (!text) return; try { await addDoc(collection(db, 'posts', id, 'comments'), { uid: me.uid, author: me.name, text, createdAt: iso() }); await updateDoc(doc(db, 'posts', id), { commentsCount: increment(1) }); p.commentsCount = (p.commentsCount || 0) + 1; $('#cn').value = ''; await load(); } catch (e) { toast('Помилка: ' + e.message); } };
+  $('#cl').onclick = async e => { const c = e.target.dataset.dc; if (!c) return; e.preventDefault(); await deleteDoc(doc(db, 'posts', id, 'comments', c)); await updateDoc(doc(db, 'posts', id), { commentsCount: increment(-1) }); p.commentsCount--; load(); };
+  if (can(p.uid)) $('#dp').onclick = async () => { if (!confirm('Видалити пост?')) return; await deleteDoc(doc(db, 'posts', id)); posts = posts.filter(x => x !== p); closeSheet(); render(); };
+}
+
+/* ---------- members ---------- */
+function rMem() {
+  $('#main').innerHTML = `<h1 class="sec">Учасники</h1>` + [...users].sort((a, b) => a.approved - b.approved || a.name.localeCompare(b.name)).map(u => `<div class="mem"><div class="av">${esc(u.name[0].toUpperCase())}</div>
+<div class="nm" ${u.approved ? `data-lib="${u.uid}"` : ''}>${esc(u.name)} <span class="meta" style="margin:0">${u.role === 'admin' ? '· адмін' : u.approved ? '· учасник' : '· очікує підтвердження'}</span></div>
+${isAd() && u.uid !== me.uid ? `<button class="btn ${u.approved ? '' : 'red'}" data-ap="${u.uid}" data-v="${u.approved ? 0 : 1}">${u.approved ? 'Заблокувати' : 'Підтвердити'}</button>` : ''}</div>`).join('');
+}
+async function setApproved(uid, v) { try { await updateDoc(doc(db, 'users', uid), { approved: v }); users.find(u => u.uid === uid).approved = v; render(); } catch (e) { toast('Помилка: ' + e.message); } }
+async function viewLib(uid) { const u = users.find(x => x.uid === uid); if (uid === me.uid) lib = { uid, name: me.name, entries: mine }; else lib = { uid, name: u.name, entries: await loadEntries(uid) }; filter = 'all'; go('lib'); }
+
+/* ---------- delegated clicks ---------- */
+$('#main').onclick = e => {
+  const g = s => e.target.closest(s); let t;
+  if (t = g('[data-tab]')) { filter = t.dataset.tab; return render(); }
+  if (t = g('[data-tag]')) { tag = t.dataset.tag; return render(); }
+  if (t = g('[data-up]')) return vote(t.dataset.up);
+  if (t = g('[data-ap]')) return setApproved(t.dataset.ap, t.dataset.v === '1');
+  if (t = g('[data-lib]')) return viewLib(t.dataset.lib);
+  if (t = g('[data-i]')) return openMovie(lib.entries.find(z => z.id === t.dataset.i));
+  if (t = g('[data-tm]')) return openMovie(disc[+t.dataset.tm]);
+  if (t = g('[data-p]')) return openPost(t.dataset.p);
+  if (g('#np')) return openNew();
+  if (g('#mig')) return migrate();
+};
+$('#main').onchange = e => { if (e.target.id === 'sort') { sort = e.target.value; render(); } if (e.target.id === 'dsrc') { dsrc = e.target.value; go('disc'); } };
+</script>
+</body>
+</html>
