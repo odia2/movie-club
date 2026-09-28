@@ -81,6 +81,11 @@ textarea{min-height:80px;resize:vertical}label.ck{display:flex;gap:8px;align-ite
 .t4.e4{border:2px dashed var(--line);display:grid;place-items:center;text-align:center;color:var(--mut);font-size:12px;padding:8px;cursor:default}
 .rv{display:flex;gap:14px;background:var(--s1);border-radius:8px;padding:12px;margin-bottom:10px;cursor:pointer}.rv img{width:64px;height:96px;object-fit:cover;border-radius:5px;flex:none}
 .rv p{color:#cfc6e3;font-size:14px;line-height:1.5;margin-top:6px;white-space:pre-wrap}
+.logo{cursor:pointer}
+.rowh{display:flex;gap:14px;overflow-x:auto;padding-bottom:10px}.rowh .card{flex:0 0 160px}
+.rank{position:absolute;top:0;left:0;z-index:1;background:var(--ac);color:#fff;font-weight:900;padding:4px 10px;border-radius:0 0 8px 0}
+.news{display:flex;gap:14px;background:var(--s1);border-radius:8px;padding:10px;margin-bottom:8px;color:var(--tx);text-decoration:none}.news:hover{background:var(--s2)}
+.news img{width:120px;height:68px;object-fit:cover;border-radius:5px;flex:none}.news b{font-weight:500;line-height:1.35}.news .meta{margin:4px 0 0}
 </style>
 </head>
 <body>
@@ -127,7 +132,9 @@ const TABS = [['all','Всі'],['watched','Подивився'],['watchlist','Х
 const DSRC = [['trending/all/week','В тренді'],['movie/top_rated','Топ фільмів'],['tv/top_rated','Топ серіалів'],['movie/now_playing','Зараз у кіно']];
 const TAGS = ['Питання','Порада','Рецензія','Обговорення'];
 const inLib = (e, l) => l === 'all' || (l === 'watched' ? e.watched : l === 'movie' ? isM(e) : l === 'tv' ? e.type === 'tv' : !!e.libraries?.includes(l));
-let me, mine = [], lib = {}, view = 'lib', filter = 'all', sort = 'new', posts = [], tag = 'Усі', users = [], disc = [], dsrc = DSRC[0][0], tok = 0, trk = null, signup = false, nameHint = '', prof = null;
+let me, mine = [], lib = {}, view = 'lib', filter = 'all', sort = 'new', posts = [], tag = 'Усі', users = [], disc = [], dsrc = DSRC[0][0], tok = 0, trk = null, signup = false, nameHint = '', prof = null, home = [];
+const RSS_KEY = ''; // необов'язково: безкоштовний ключ з rss2json.com, якщо новини не вантажаться
+const HOME = [['trending/all/week', 'Топ-15 тижня', 15, 1], ['movie/now_playing', 'Зараз у кіно', 12], ['movie/upcoming', 'Скоро в кіно', 12], ['tv/popular', 'Популярні серіали', 12]];
 const isAd = () => me?.role === 'admin', own = () => lib.uid === me.uid;
 let tt; const toast = t => { const e = $('#toast'); e.textContent = t; e.classList.add('show'); clearTimeout(tt); tt = setTimeout(() => e.classList.remove('show'), 2400); };
 const sheet = h => { tok++; $('#sh').innerHTML = `<button class="x" id="mx">×</button>` + h; $('#ov').style.display = 'block'; document.body.style.overflow = 'hidden'; $('#mx').onclick = closeSheet; };
@@ -154,11 +161,11 @@ onAuthStateChanged(auth, async u => {
   me = { uid: u.uid, ...s.data() }; $('#auth').style.display = 'none';
   if (!me.approved) { $('#pend').style.display = 'grid'; return; }
   $('#pend').style.display = 'none'; $('#uname').textContent = me.name; $('#uav').textContent = me.name[0].toUpperCase();
-  mine = await loadEntries(me.uid); lib = { uid: me.uid, name: me.name, entries: mine }; go('lib');
+  mine = await loadEntries(me.uid); lib = { uid: me.uid, name: me.name, entries: mine }; go('home');
 });
 const loadEntries = async uid => (await getDocs(collection(db, 'users', uid, 'entries'))).docs.map(d => ({ id: d.id, ...d.data() }));
 
-$('#uav').onclick = () => viewProf(me.uid); $('#uav').style.cursor = 'pointer';
+document.querySelector('.logo').onclick = () => go('home'); $('#uav').onclick = () => viewProf(me.uid); $('#uav').style.cursor = 'pointer';
 
 /* ---------- navigation ---------- */
 document.querySelector('.nav').onclick = e => { const b = e.target.closest('[data-v]'); if (!b) return; if (b.dataset.v === 'lib') lib = { uid: me.uid, name: me.name, entries: mine }; go(b.dataset.v); };
@@ -166,6 +173,7 @@ async function go(v) {
   view = v; const nv = v === 'prof' || (v === 'lib' && lib.uid !== me.uid) ? 'mem' : v; document.querySelectorAll('.nav button').forEach(b => b.classList.toggle('on', b.dataset.v === nv));
   $('#main').innerHTML = '<div class="empty">Завантаження…</div>';
   try {
+    if (v === 'home') await loadHome();
     if (v === 'com') posts = (await getDocs(query(collection(db, 'posts'), orderBy('createdAt', 'desc')))).docs.map(d => ({ id: d.id, ...d.data() }));
     if (v === 'mem') users = (await getDocs(collection(db, 'users'))).docs.map(d => ({ uid: d.id, ...d.data() }));
     if (v === 'disc') { const d = await tm(dsrc); disc = d.results.filter(x => x.media_type !== 'person' && x.poster_path).map(x => mapT(x, dsrc.startsWith('trending') ? x.media_type : dsrc.split('/')[0])); }
@@ -173,7 +181,7 @@ async function go(v) {
   render();
 }
 const mapT = (x, t) => ({ tmdb_id: String(x.id), type: t || x.media_type || 'movie', title: x.title || x.name, poster: x.poster_path ? IMG + 'w500' + x.poster_path : '', year: (x.release_date || x.first_air_date || '').slice(0, 4) || '—', vote: x.vote_average });
-const render = () => ({ lib: rLib, disc: rDisc, com: rCom, mem: rMem, prof: rProf })[view]();
+const render = () => ({ lib: rLib, disc: rDisc, com: rCom, mem: rMem, prof: rProf, home: rHome })[view]();
 const card = (e, attr, score) => {
   const r = num(e.rating), has = mine.some(z => z.id === eid(e.type, e.tmdb_id)), wl = e.libraries?.includes('watchlist');
   return `<article class="card ${e.watched || (attr.startsWith('data-tm') && has) ? 'w' : ''}" ${attr}><div class="pw"><img loading="lazy" src="${esc(e.poster)}" alt="">${wl ? '<span class="bm"></span>' : ''}${e.watched || (attr.startsWith('data-tm') && has) ? '<span class="chk">✓</span>' : ''}${attr.startsWith('data-i') && lib.uid !== me.uid && mine.some(z => z.id === eid(e.type, e.tmdb_id) && z.watched) ? '<span class="seen">👁 Ти дивився</span>' : ''}</div>
@@ -202,6 +210,32 @@ async function migrate() {
     s.docs.forEach(d => { const m = d.data(); if (!m.tmdb_id) return; const { addedBy, ...r } = m; b.set(doc(db, 'users', me.uid, 'entries', eid(m.type, m.tmdb_id)), { ...r, tmdb_id: String(m.tmdb_id), watched: m.watched === true, libraries: m.libraries || ['all'] }, { merge: true }); n++; });
     await b.commit(); mine = await loadEntries(me.uid); lib.entries = mine; render(); toast(`Перенесено: ${n}`);
   } catch (e) { toast('Помилка: ' + e.message); }
+}
+
+/* ---------- home ---------- */
+async function loadHome() {
+  disc = []; home = [];
+  const res = await Promise.all(HOME.map(([p]) => tm(p).catch(() => ({ results: [] }))));
+  res.forEach((d, k) => {
+    const [p, t, n, r] = HOME[k];
+    const items = (d.results || []).filter(x => x.media_type !== 'person' && x.poster_path).slice(0, n).map(x => mapT(x, p.startsWith('trending') ? x.media_type : p.split('/')[0]));
+    home.push({ t, s: disc.length, n: items.length, r: !!r }); disc.push(...items);
+  });
+}
+function rHome() {
+  $('#main').innerHTML = home.map(h => `<h2 class="sub" style="margin-top:0">${h.t}</h2><div class="rowh">${disc.slice(h.s, h.s + h.n).map((o, i) => {
+    const c = card(o, `data-tm="${h.s + i}"`, (o.vote || 0).toFixed(1));
+    return h.r ? c.replace('<div class="pw">', `<div class="pw"><span class="rank">${i + 1}</span>`) : c;
+  }).join('')}</div>`).join('') + '<h2 class="sub">Новини кіно</h2><div id="news"><p class="meta">Завантаження новин…</p></div>';
+  loadNews();
+}
+async function loadNews() {
+  const feeds = ['https://variety.com/feed/', 'https://deadline.com/feed/'];
+  const rs = await Promise.all(feeds.map(f => fetch('https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(f) + (RSS_KEY ? '&api_key=' + RSS_KEY : '')).then(r => r.json()).catch(() => null)));
+  const box = $('#news'); if (!box || view !== 'home') return;
+  const d = x => new Date(String(x).replace(' ', 'T') + 'Z');
+  const items = rs.flatMap(r => r?.status === 'ok' ? r.items.map(i => ({ ...i, src: r.feed.title })) : []).filter(i => /^https?:/.test(i.link)).sort((a, b) => d(b.pubDate) - d(a.pubDate)).slice(0, 8);
+  box.innerHTML = items.length ? items.map(n => `<a class="news" href="${esc(n.link)}" target="_blank" rel="noopener">${n.thumbnail ? `<img src="${esc(n.thumbnail)}" alt="">` : ''}<div><b>${esc(n.title)}</b><p class="meta">${esc(n.src)} · ${ago(d(n.pubDate).toISOString())}</p></div></a>`).join('') : '<p class="meta">Новини тимчасово недоступні.</p>';
 }
 
 /* ---------- discover ---------- */
