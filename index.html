@@ -7,7 +7,7 @@
 <link rel="icon" type="image/jpeg" href="favicon.jpg">
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#0f0a1a;--hd:#0a0612;--s1:#1b1428;--s2:#261d38;--line:#3a2f52;--tx:#f5f0ff;--mut:#a99fc0;--ac:#8b5cf6;--ac2:#b39bfa;--star:#f5c518;--ok:#4fd1b5}
+:root{--tx2:#cfc6e3;--cw:180px;--bg:#0f0a1a;--hd:#0a0612;--s1:#1b1428;--s2:#261d38;--line:#3a2f52;--tx:#f5f0ff;--mut:#a99fc0;--ac:#8b5cf6;--ac2:#b39bfa;--star:#f5c518;--ok:#4fd1b5}
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:var(--bg);color:var(--tx);font-family:Roboto,'Segoe UI',system-ui,sans-serif;min-height:100vh}
 button,input,select,textarea{font:inherit;color:inherit}button{cursor:pointer;border:0;background:none}a{color:var(--ac2)}
@@ -37,7 +37,7 @@ main{padding:28px clamp(16px,4vw,48px) 60px;max-width:1360px;margin:0 auto}
 .tab.on{background:var(--ac);border-color:var(--ac);color:#fff}
 select,.btn{padding:8px 14px;background:var(--s1);border:1px solid var(--line);border-radius:6px;font-size:14px}
 .btn:hover,select:hover{background:var(--s2)}.btn.red{background:var(--ac);border-color:var(--ac);color:#fff;font-weight:700}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(var(--cw),1fr));gap:14px}
 .card{background:var(--s1);border-radius:8px;overflow:hidden;cursor:pointer;border:1px solid transparent}.card:hover{border-color:var(--line)}
 .pw{position:relative;aspect-ratio:2/3;background:var(--s2)}.pw img{width:100%;height:100%;object-fit:cover;display:block}
 .card.w .pw img{filter:saturate(.75) brightness(.9)}
@@ -51,7 +51,7 @@ select,.btn{padding:8px 14px;background:var(--s1);border:1px solid var(--line);b
 .post{display:flex;gap:14px;background:var(--s1);border-radius:8px;padding:14px;margin-bottom:10px;cursor:pointer}
 .vote{display:flex;flex-direction:column;align-items:center;min-width:32px}.vote button{color:var(--mut);font-size:16px}.vote button.on{color:var(--ac2)}
 .tagc{background:var(--s2);color:var(--ac2);padding:2px 9px;border-radius:999px;font-size:12px;font-weight:500}
-.pb h3{margin:8px 0 4px;font-size:18px}.pb p{color:#cfc6e3;font-size:14px;line-height:1.5;margin-bottom:6px}
+.pb h3{margin:8px 0 4px;font-size:18px}.pb p{color:var(--tx2);font-size:14px;line-height:1.5;margin-bottom:6px}
 .mem{display:flex;align-items:center;gap:12px;background:var(--s1);border-radius:8px;padding:12px 14px;margin-bottom:8px}.nm{flex:1;cursor:pointer;font-weight:500}
 .back{position:fixed;inset:0;background:#000b;z-index:200;display:none;overflow-y:auto;padding:24px 12px}
 .sheet{position:relative;max-width:860px;margin:0 auto;background:var(--s1);border-radius:12px;overflow:hidden}
@@ -81,12 +81,22 @@ textarea{min-height:80px;resize:vertical}label.ck{display:flex;gap:8px;align-ite
 .t4 .rm{position:absolute;top:6px;right:6px;width:24px;height:24px;border-radius:50%;background:#000c;display:grid;place-items:center}
 .t4.e4{border:2px dashed var(--line);display:grid;place-items:center;text-align:center;color:var(--mut);font-size:12px;padding:8px;cursor:default}
 .rv{display:flex;gap:14px;background:var(--s1);border-radius:8px;padding:12px;margin-bottom:10px;cursor:pointer}.rv img{width:64px;height:96px;object-fit:cover;border-radius:5px;flex:none}
-.rv p{color:#cfc6e3;font-size:14px;line-height:1.5;margin-top:6px;white-space:pre-wrap}
+.rv p{color:var(--tx2);font-size:14px;line-height:1.5;margin-top:6px;white-space:pre-wrap}
 .logo{cursor:pointer}
 .rowh{display:flex;gap:14px;overflow-x:auto;padding-bottom:10px}.rowh .card{flex:0 0 160px}
 .rank{position:absolute;top:0;left:0;z-index:1;background:var(--ac);color:#fff;font-weight:900;padding:4px 10px;border-radius:0 0 8px 0}
 .news{display:flex;gap:14px;background:var(--s1);border-radius:8px;padding:10px;margin-bottom:8px;color:var(--tx);text-decoration:none}.news:hover{background:var(--s2)}
 .news img{width:120px;height:68px;object-fit:cover;border-radius:5px;flex:none}.news b{font-weight:500;line-height:1.35}.news .meta{margin:4px 0 0}
+[data-theme=amoled]{--bg:#000;--hd:#000;--s1:#0d0d10;--s2:#17171c;--line:#26262e}
+[data-theme=light]{--bg:#f6f3fb;--hd:#fff;--s1:#fff;--s2:#ece7f6;--line:#d9d0ea;--tx:#1a1128;--tx2:#4a3f63;--mut:#6b5f85}
+[data-theme=light] .card,[data-theme=light] .post,[data-theme=light] .mem,[data-theme=light] .rv{box-shadow:0 1px 3px #0002}
+.x{color:#fff}.av{background-size:cover;background-position:center}
+.tog.on:before{content:'✓ '}
+.sw{width:32px;height:32px;border-radius:50%;border:3px solid transparent}.sw.on{border-color:var(--tx)}
+.banner{height:200px;border-radius:12px;background:linear-gradient(120deg,var(--ac),var(--s2)) center/cover}
+.prof2{display:flex;align-items:flex-end;gap:16px;margin:-44px 20px 0;position:relative;flex-wrap:wrap}
+.prof2 .pi{flex:1;min-width:200px;padding-top:48px}.av.big{width:96px;height:96px;font-size:40px;border:4px solid var(--bg)}
+#gear{font-size:16px;padding:6px 10px}
 </style>
 </head>
 <body>
@@ -104,8 +114,8 @@ textarea{min-height:80px;resize:vertical}label.ck{display:flex;gap:8px;align-ite
 <div class="top">
 <header><div class="logo">MOVIE CLUB</div>
 <div class="search"><input id="q" placeholder="Знайти фільм або серіал…" autocomplete="off"><div class="results" id="results"></div></div>
-<div class="user"><span id="uname"></span><div class="av" id="uav"></div><button class="out" id="logout">Вийти</button></div></header>
-<nav class="nav"><button data-v="lib" class="on">Моя бібліотека</button><button data-v="disc">Відкрити</button><button data-v="com">Спільнота</button><button data-v="mem">Учасники</button></nav>
+<div class="user"><button class="out" id="gear" title="Налаштування">⚙</button><span id="uname"></span><div class="av" id="uav"></div><button class="out" id="logout">Вийти</button></div></header>
+<nav class="nav"><button data-v="lib" class="on">Моя бібліотека</button><button data-v="disc">Відкрити</button><button data-v="com">Спільнота</button><button data-v="mem">Учасники</button><button data-v="prof">Профіль</button></nav>
 </div>
 <main id="main"></main>
 <div class="back" id="ov"><div class="sheet" id="sh"></div></div>
@@ -124,11 +134,53 @@ const auth = getAuth(app), db = getFirestore(app);
 const TMDB = "e58d0bd8f6cdc8a3a80354d83e044fe4", ADMIN = "bogdan17261726@gmail.com", IMG = "https://image.tmdb.org/t/p/";
 const $ = s => document.querySelector(s), iso = () => new Date().toISOString();
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const tm = (p, q = '') => fetch(`https://api.themoviedb.org/3/${p}?api_key=${TMDB}&language=ru-RU${q}`).then(r => r.json());
+const tm = (p, q = '') => fetch(`https://api.themoviedb.org/3/${p}?api_key=${TMDB}&language=${TL[cfg.lang]}${q}`).then(r => r.json());
 const eid = (t, id) => `${t || 'movie'}_${id}`, isM = e => !e.type || e.type === 'movie';
 const num = r => { const n = parseFloat(r); return !r || r === 'N/A' || isNaN(n) ? -1 : n; };
 const ratingStr = v => isNaN(parseFloat(v)) ? 'N/A' : `${parseFloat(v)}/10`;
 const ago = t => { const m = (Date.now() - new Date(t)) / 6e4; return m < 1 ? 'щойно' : m < 60 ? `${~~m} хв тому` : m < 1440 ? `${~~(m / 60)} год тому` : `${~~(m / 1440)} дн тому`; };
+const ACC = { violet: ['#8b5cf6', '#b39bfa'], red: ['#e5484d', '#ff8f92'], blue: ['#3b82f6', '#8ab8ff'], green: ['#22c55e', '#7be49d'], pink: ['#ec4899', '#f59ac8'] };
+let cfg = { lang: 'uk', theme: 'dark', acc: 'violet', size: 'normal' };
+try { Object.assign(cfg, JSON.parse(localStorage.getItem('mc') || '{}')); } catch {}
+const TL = { uk: 'ru-RU', ru: 'ru-RU', en: 'en-US' };
+function applySettings() {
+  const r = document.documentElement, a = ACC[cfg.acc] || ACC.violet;
+  r.dataset.theme = cfg.theme; r.lang = cfg.lang; r.style.setProperty('--ac', a[0]); r.style.setProperty('--ac2', cfg.theme === 'light' ? a[0] : a[1]);
+  r.style.setProperty('--cw', { compact: '140px', normal: '180px', large: '230px' }[cfg.size] || '180px');
+}
+applySettings();
+const DICT = {
+'Моя бібліотека':['Моя библиотека','My library'],'Відкрити':['Открыть','Discover'],'Спільнота':['Сообщество','Community'],'Учасники':['Участники','Members'],'Профіль':['Профиль','Profile'],
+'Вийти':['Выйти','Log out'],'Знайти фільм або серіал…':['Найти фильм или сериал…','Find a movie or series…'],'Всього':['Всего','Total'],'Фільми':['Фильмы','Movies'],'Серіали':['Сериалы','Series'],
+'Подивився':['Просмотрено','Watched'],'Середня оцінка':['Средняя оценка','Average rating'],'Всі':['Все','All'],'Хочу подивитись':['Хочу посмотреть','Watchlist'],'Улюблені':['Любимые','Favorites'],
+'Спочатку нові':['Сначала новые','Newest first'],'Оцінка ↓':['Оценка ↓','Rating ↓'],'Оцінка ↑':['Оценка ↑','Rating ↑'],'Рік ↓':['Год ↓','Year ↓'],'Рік ↑':['Год ↑','Year ↑'],'Назва А–Я':['Название А–Я','Title A–Z'],
+'⬇ Імпорт зі старої бази':['⬇ Импорт из старой базы','⬇ Import from old base'],'Топ-15 тижня':['Топ-15 недели','Top 15 this week'],'Зараз у кіно':['Сейчас в кино','Now playing'],
+'Скоро в кіно':['Скоро в кино','Coming soon'],'Популярні серіали':['Популярные сериалы','Popular series'],'Новини кіно':['Новости кино','Movie news'],'Завантаження новин…':['Загрузка новостей…','Loading news…'],
+'Новини тимчасово недоступні.':['Новости временно недоступны.','News temporarily unavailable.'],'В тренді':['В тренде','Trending'],'Топ фільмів':['Топ фильмов','Top movies'],'Топ серіалів':['Топ сериалов','Top series'],
+'Усі':['Все','All'],'Питання':['Вопрос','Question'],'Порада':['Совет','Tip'],'Рецензія':['Рецензия','Review'],'Обговорення':['Обсуждение','Discussion'],'+ Новий пост':['+ Новый пост','+ New post'],
+'Новий пост':['Новый пост','New post'],'Опублікувати':['Опубликовать','Publish'],'Коментарі':['Комментарии','Comments'],'Надіслати':['Отправить','Send'],'Видалити пост':['Удалить пост','Delete post'],
+'· адмін':['· админ','· admin'],'· учасник':['· участник','· member'],'· очікує підтвердження':['· ждёт подтверждения','· pending approval'],'Підтвердити':['Подтвердить','Approve'],'Заблокувати':['Заблокировать','Block'],
+'Топ-4 улюблених':['Топ-4 любимых','Top 4 favorites'],'Рецензії':['Рецензии','Reviews'],'Уся бібліотека':['Вся библиотека','Full library'],'Адмін':['Админ','Admin'],'Учасник':['Участник','Member'],
+'Поки немає рецензій.':['Пока нет рецензий.','No reviews yet.'],'Мій запис':['Моя запись','My entry'],'👁 Подивився':['👁 Просмотрено','👁 Watched'],'🔖 Хочу подивитись':['🔖 Хочу посмотреть','🔖 Watchlist'],
+'♥ Улюблений':['♥ Любимый','♥ Favorite'],'★ У топ-4':['★ В топ-4','★ Add to top 4'],'Зберегти':['Сохранить','Save'],'Видалити':['Удалить','Delete'],'▶ Трейлер':['▶ Трейлер','▶ Trailer'],'Схожі':['Похожие','Similar'],
+'Завантаження опису…':['Загрузка описания…','Loading description…'],'Завантаження…':['Загрузка…','Loading…'],'Вхід':['Вход','Log in'],'Увійти':['Войти','Log in'],'Створити акаунт':['Создать аккаунт','Create account'],
+'Забули пароль?':['Забыли пароль?','Forgot password?'],'Чекаємо підтвердження':['Ждём подтверждения','Waiting for approval'],'Налаштування':['Настройки','Settings'],'Мова':['Язык','Language'],'Тема':['Тема','Theme'],
+'Колір акценту':['Цвет акцента','Accent color'],'Розмір карток':['Размер карточек','Card size'],'Темна':['Тёмная','Dark'],'AMOLED (чорна)':['AMOLED (чёрная)','AMOLED (black)'],'Світла':['Светлая','Light'],
+'Компактні':['Компактные','Compact'],'Звичайні':['Обычные','Normal'],'Великі':['Большие','Large'],'⚙ Налаштування профілю':['⚙ Настройки профиля','⚙ Profile settings'],'Налаштування профілю':['Настройки профиля','Profile settings'],
+"Ім'я":['Имя','Name'],'Про себе':['О себе','About'],'🖼 Аватар':['🖼 Аватар','🖼 Avatar'],'🏞 Банер':['🏞 Баннер','🏞 Banner'],'Прибрати аватар':['Убрать аватар','Remove avatar'],'Прибрати банер':['Убрать баннер','Remove banner'],
+'Рецензії видно всім':['Рецензии видны всем','Reviews visible to all'],'Топ-4 видно всім':['Топ-4 виден всем','Top 4 visible to all'],'Переглянуті видно всім':['Просмотренные видны всем','Watched visible to all']
+};
+const trNode = n => {
+  if (cfg.lang === 'uk') return; const i = cfg.lang === 'ru' ? 0 : 1;
+  if (n.nodeType === 3) { const k = n.nodeValue.trim(), d = DICT[k]; if (d) n.nodeValue = n.nodeValue.replace(k, d[i]); return; }
+  if (n.nodeType !== 1) return;
+  const w = document.createTreeWalker(n, NodeFilter.SHOW_TEXT); let x; while (x = w.nextNode()) trNode(x);
+  n.querySelectorAll('[placeholder]').forEach(e => { const d = DICT[e.getAttribute('placeholder')]; if (d) e.placeholder = d[i]; });
+};
+const safeImg = v => /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+\/=]+$/.test(v || '') ? v : '';
+const avHtml = (u, c = '') => { const a = safeImg(u.avatar); return `<div class="av ${c}" ${a ? `style="background-image:url(${a})"` : ''}>${a ? '' : esc((u.name || '?')[0].toUpperCase())}</div>`; };
+const setAv = (el, u) => { const a = safeImg(u.avatar); el.style.backgroundImage = a ? `url(${a})` : ''; el.textContent = a ? '' : (u.name || '?')[0].toUpperCase(); };
+const shrink = (file, w, h) => new Promise((ok, no) => { const img = new Image(); img.onload = () => { const c = document.createElement('canvas'); c.width = w; c.height = h; const k = Math.max(w / img.width, h / img.height); c.getContext('2d').drawImage(img, (w - img.width * k) / 2, (h - img.height * k) / 2, img.width * k, img.height * k); URL.revokeObjectURL(img.src); ok(c.toDataURL('image/jpeg', .82)); }; img.onerror = no; img.src = URL.createObjectURL(file); });
 const TABS = [['all','Всі'],['watched','Подивився'],['watchlist','Хочу подивитись'],['favorites','Улюблені'],['movie','Фільми'],['tv','Серіали']];
 const DSRC = [['trending/all/week','В тренді'],['movie/top_rated','Топ фільмів'],['tv/top_rated','Топ серіалів'],['movie/now_playing','Зараз у кіно']];
 const TAGS = ['Питання','Порада','Рецензія','Обговорення'];
@@ -161,17 +213,17 @@ onAuthStateChanged(auth, async u => {
   if (!s.exists()) { const ad = u.email === ADMIN; await setDoc(ref, { email: u.email, name: nameHint || u.email.split('@')[0], role: ad ? 'admin' : 'member', approved: ad, createdAt: iso() }); s = await getDoc(ref); }
   me = { uid: u.uid, ...s.data() }; $('#auth').style.display = 'none';
   if (!me.approved) { $('#pend').style.display = 'grid'; return; }
-  $('#pend').style.display = 'none'; $('#uname').textContent = me.name; $('#uav').textContent = me.name[0].toUpperCase();
+  $('#pend').style.display = 'none'; $('#uname').textContent = me.name; setAv($('#uav'), me);
   mine = await loadEntries(me.uid); lib = { uid: me.uid, name: me.name, entries: mine }; go('home');
 });
 const loadEntries = async uid => (await getDocs(collection(db, 'users', uid, 'entries'))).docs.map(d => ({ id: d.id, ...d.data() }));
 
-document.querySelector('.logo').onclick = () => go('home'); $('#uav').onclick = () => viewProf(me.uid); $('#uav').style.cursor = 'pointer';
+document.querySelector('.logo').onclick = () => go('home'); $('#gear').onclick = () => openApp(); $('#uav').onclick = () => viewProf(me.uid); $('#uav').style.cursor = 'pointer';
 
 /* ---------- navigation ---------- */
-document.querySelector('.nav').onclick = e => { const b = e.target.closest('[data-v]'); if (!b) return; if (b.dataset.v === 'lib') lib = { uid: me.uid, name: me.name, entries: mine }; go(b.dataset.v); };
+document.querySelector('.nav').onclick = e => { const b = e.target.closest('[data-v]'); if (!b) return; if (b.dataset.v === 'prof') return viewProf(me.uid); if (b.dataset.v === 'lib') lib = { uid: me.uid, name: me.name, entries: mine }; go(b.dataset.v); };
 async function go(v) {
-  view = v; const nv = v === 'prof' || (v === 'lib' && lib.uid !== me.uid) ? 'mem' : v; document.querySelectorAll('.nav button').forEach(b => b.classList.toggle('on', b.dataset.v === nv));
+  view = v; const nv = v === 'prof' ? (prof.u.uid === me.uid ? 'prof' : 'mem') : v === 'lib' && lib.uid !== me.uid ? 'mem' : v; document.querySelectorAll('.nav button').forEach(b => b.classList.toggle('on', b.dataset.v === nv));
   $('#main').innerHTML = '<div class="empty">Завантаження…</div>';
   try {
     if (v === 'home') await loadHome();
@@ -343,7 +395,7 @@ ${can(p.uid) ? '<button class="btn" id="dp">Видалити пост</button>' 
 
 /* ---------- members ---------- */
 function rMem() {
-  $('#main').innerHTML = `<h1 class="sec">Учасники</h1>` + [...users].sort((a, b) => a.approved - b.approved || a.name.localeCompare(b.name)).map(u => `<div class="mem"><div class="av">${esc(u.name[0].toUpperCase())}</div>
+  $('#main').innerHTML = `<h1 class="sec">Учасники</h1>` + [...users].sort((a, b) => a.approved - b.approved || a.name.localeCompare(b.name)).map(u => `<div class="mem">${avHtml(u)}
 <div class="nm" ${u.approved ? `data-prof="${u.uid}"` : ''}>${esc(u.name)} <span class="meta" style="margin:0">${u.role === 'admin' ? '· адмін' : u.approved ? '· учасник' : '· очікує підтвердження'}</span></div>
 ${isAd() && u.uid !== me.uid ? `<button class="btn ${u.approved ? '' : 'red'}" data-ap="${u.uid}" data-v="${u.approved ? 0 : 1}">${u.approved ? 'Заблокувати' : 'Підтвердити'}</button>` : ''}</div>`).join('');
 }
@@ -354,18 +406,56 @@ async function viewLib(uid) {
   const hid = uid !== me.uid && u.showWatched === false; if (hid) en = en.filter(e => !e.watched);
   lib = { uid, name: u.name, entries: en, hid }; filter = 'all'; go('lib');
 }
-async function viewProf(uid) { const u = uid === me.uid ? me : users.find(x => x.uid === uid); prof = { u, entries: uid === me.uid ? mine : await loadEntries(uid) }; go('prof'); }
+async function viewProf(uid) {
+  const u = uid === me.uid ? me : users.find(x => x.uid === uid); let banner = '';
+  try { const b = await getDoc(doc(db, 'users', uid, 'meta', 'banner')); banner = b.exists() ? b.data().data || '' : ''; } catch {}
+  prof = { u, banner, entries: uid === me.uid ? mine : await loadEntries(uid) }; go('prof');
+}
 async function dropTop(id) { if (!me.top4?.some(x => x.id === id)) return; const top = me.top4.filter(x => x.id !== id); await updateDoc(doc(db, 'users', me.uid), { top4: top }); me.top4 = top; }
 async function rmTop(i) { try { const top = me.top4.filter((_, j) => j !== i); await updateDoc(doc(db, 'users', me.uid), { top4: top }); me.top4 = top; render(); } catch (e) { toast('Помилка: ' + e.message); } }
 async function toggleShow() { const v = me.showWatched === false; try { await updateDoc(doc(db, 'users', me.uid), { showWatched: v }); me.showWatched = v; render(); toast(v ? 'Переглянуті фільми бачать усі' : 'Переглянуті фільми приховано'); } catch (e) { toast('Помилка: ' + e.message); } }
 function rProf() {
-  const { u, entries } = prof, mp = u.uid === me.uid, hide = !mp && u.showWatched === false, en = hide ? entries.filter(e => !e.watched) : entries, top = u.top4 || [];
+  const { u, entries, banner } = prof, mp = u.uid === me.uid, hide = !mp && u.showWatched === false, en = hide ? entries.filter(e => !e.watched) : entries, top = u.top4 || [];
+  const showRev = mp || u.showReviews !== false, showTop = mp || u.showTop4 !== false, bn = safeImg(banner);
   const revs = en.filter(e => e.comment?.trim()).sort((a, b) => (b.watchedAt || b.createdAt || '').localeCompare(a.watchedAt || a.createdAt || ''));
-  $('#main').innerHTML = `<div class="prof"><div class="av big">${esc(u.name[0].toUpperCase())}</div><div><h1 class="sec" style="margin:0 0 6px">${esc(u.name)}</h1><p class="meta" style="margin:0">${u.role === 'admin' ? 'Адмін' : 'Учасник'}${hide ? '' : ` · переглянуто: ${en.filter(e => e.watched).length}`} · рецензій: ${revs.length}</p></div></div>
-${mp ? `<button class="tog ${u.showWatched !== false ? 'on' : ''}" id="swb">👁 Мої переглянуті фільми бачать інші: ${u.showWatched !== false ? 'так' : 'ні'}</button>` : ''}
-<h2 class="sub">Топ-4 улюблених</h2><div class="top4">${[0, 1, 2, 3].map(i => top[i] ? `<div class="t4" data-t4="${i}"><img src="${esc(top[i].poster)}" alt="${esc(top[i].title)}">${mp ? `<span class="rm" data-rm="${i}">×</span>` : ''}</div>` : `<div class="t4 e4">${mp ? 'Познач переглянутий фільм кнопкою «★ У топ-4»' : '—'}</div>`).join('')}</div>
-<h2 class="sub">Рецензії</h2>${revs.length ? revs.map(e => `<div class="rv" data-pi="${e.id}"><img src="${esc(e.poster)}" alt=""><div><b>${esc(e.title)}</b> <span class="yr">${esc(e.year)}</span>${num(e.rating) >= 0 ? ` <span class="star">★ ${esc(e.rating.split('/')[0])}</span>` : ''}<p>${esc(e.comment)}</p></div></div>`).join('') : '<p class="meta">Поки немає рецензій.</p>'}
+  $('#main').innerHTML = `<div class="banner" ${bn ? `style="background-image:url(${bn})"` : ''}></div>
+<div class="prof2">${avHtml(u, 'big')}<div class="pi"><h1 class="sec" style="margin:0 0 4px">${esc(u.name)}</h1><p class="meta" style="margin:0"><span>${u.role === 'admin' ? 'Адмін' : 'Учасник'}</span>${hide ? '' : ` · переглянуто: ${en.filter(e => e.watched).length}`}</p>${u.bio ? `<p class="over" style="margin:8px 0 0">${esc(u.bio)}</p>` : ''}</div>${mp ? '<button class="btn" id="pset">⚙ Налаштування профілю</button>' : ''}</div>
+<h2 class="sub">Топ-4 улюблених</h2>${showTop ? `<div class="top4">${[0, 1, 2, 3].map(i => top[i] ? `<div class="t4" data-t4="${i}"><img src="${esc(top[i].poster)}" alt="${esc(top[i].title)}">${mp ? `<span class="rm" data-rm="${i}">×</span>` : ''}</div>` : `<div class="t4 e4">${mp ? 'Познач переглянутий фільм кнопкою «★ У топ-4»' : '—'}</div>`).join('')}</div>` : '<p class="meta">Учасник приховав свій Топ-4.</p>'}
+<h2 class="sub">Рецензії</h2>${showRev ? (revs.length ? revs.map(e => `<div class="rv" data-pi="${e.id}"><img src="${esc(e.poster)}" alt=""><div><b>${esc(e.title)}</b> <span class="yr">${esc(e.year)}</span>${num(e.rating) >= 0 ? ` <span class="star">★ ${esc(e.rating.split('/')[0])}</span>` : ''}<p>${esc(e.comment)}</p></div></div>`).join('') : '<p class="meta">Поки немає рецензій.</p>') : '<p class="meta">Учасник приховав рецензії.</p>'}
 <div class="gap" style="max-width:280px;margin-top:20px"><button class="btn red" data-full="${u.uid}">Уся бібліотека</button></div>`;
+}
+function openProfSet() {
+  const P = { name: me.name, bio: me.bio || '', avatar: me.avatar || '', banner: prof.banner || '', showReviews: me.showReviews !== false, showTop4: me.showTop4 !== false, showWatched: me.showWatched !== false };
+  sheet(`<div class="pad"><h2>Налаштування профілю</h2><p class="meta">Ім'я</p><input id="pn" maxlength="30" value="${esc(P.name)}">
+<p class="meta" style="margin-top:10px">Про себе</p><textarea id="pbio" maxlength="200">${esc(P.bio)}</textarea>
+<div class="togs" style="margin-top:10px"><label class="btn">🖼 Аватар<input type="file" id="pa" accept="image/*" hidden></label><label class="btn">🏞 Банер<input type="file" id="pbn" accept="image/*" hidden></label><button class="btn" id="pra">Прибрати аватар</button><button class="btn" id="prb">Прибрати банер</button></div>
+<p class="meta" id="pmsg"></p><div class="togs" id="pt">${[['showReviews', 'Рецензії видно всім'], ['showTop4', 'Топ-4 видно всім'], ['showWatched', 'Переглянуті видно всім']].map(([k, n]) => `<button class="tog ${P[k] ? 'on' : ''}" data-k="${k}">${n}</button>`).join('')}</div>
+<div class="gap"><button class="btn red" id="ps">Зберегти</button></div></div>`);
+  const pick = (id, key, w, h) => $(id).onchange = async e => { const f = e.target.files[0]; if (!f) return; try { P[key] = await shrink(f, w, h); $('#pmsg').textContent = 'Зображення обрано. Натисни «Зберегти».'; } catch { toast('Не вдалося прочитати зображення'); } };
+  pick('#pa', 'avatar', 256, 256); pick('#pbn', 'banner', 1200, 360);
+  $('#pra').onclick = () => { P.avatar = ''; $('#pmsg').textContent = 'Аватар буде прибрано. Натисни «Зберегти».'; };
+  $('#prb').onclick = () => { P.banner = ''; $('#pmsg').textContent = 'Банер буде прибрано. Натисни «Зберегти».'; };
+  $('#pt').onclick = e => { const b = e.target.closest('[data-k]'); if (!b) return; P[b.dataset.k] = !P[b.dataset.k]; b.classList.toggle('on', P[b.dataset.k]); };
+  $('#ps').onclick = async () => {
+    try {
+      const d = { name: $('#pn').value.trim() || me.name, bio: $('#pbio').value, avatar: P.avatar, showReviews: P.showReviews, showTop4: P.showTop4, showWatched: P.showWatched };
+      await updateDoc(doc(db, 'users', me.uid), d);
+      if (P.banner !== (prof.banner || '')) await setDoc(doc(db, 'users', me.uid, 'meta', 'banner'), { data: P.banner });
+      Object.assign(me, d); prof.banner = P.banner; $('#uname').textContent = me.name; setAv($('#uav'), me); closeSheet(); render(); toast('Збережено');
+    } catch (e) { toast('Помилка: ' + e.message); }
+  };
+}
+function openApp() {
+  const opt = (k, a) => a.map(([v, n]) => `<option value="${v}" ${cfg[k] === v ? 'selected' : ''}>${n}</option>`).join('');
+  sheet(`<div class="pad"><h2>Налаштування</h2><p class="meta">Мова</p><select id="sl">${opt('lang', [['uk', 'Українська'], ['ru', 'Русский'], ['en', 'English']])}</select>
+<p class="meta" style="margin-top:14px">Тема</p><select id="st">${opt('theme', [['dark', 'Темна'], ['amoled', 'AMOLED (чорна)'], ['light', 'Світла']])}</select>
+<p class="meta" style="margin-top:14px">Колір акценту</p><div class="togs" id="sa">${Object.entries(ACC).map(([k, c]) => `<button class="sw ${k === cfg.acc ? 'on' : ''}" data-a="${k}" style="background:${c[0]}" aria-label="${k}"></button>`).join('')}</div>
+<p class="meta">Розмір карток</p><select id="sc">${opt('size', [['compact', 'Компактні'], ['normal', 'Звичайні'], ['large', 'Великі']])}</select></div>`);
+  const save = () => { try { localStorage.setItem('mc', JSON.stringify(cfg)); } catch {} applySettings(); };
+  $('#st').onchange = e => { cfg.theme = e.target.value; save(); };
+  $('#sc').onchange = e => { cfg.size = e.target.value; save(); };
+  $('#sa').onclick = e => { const b = e.target.closest('[data-a]'); if (!b) return; cfg.acc = b.dataset.a; save(); $('#sa').querySelectorAll('.sw').forEach(x => x.classList.toggle('on', x === b)); };
+  $('#sl').onchange = e => { cfg.lang = e.target.value; save(); location.reload(); };
 }
 
 /* ---------- delegated clicks ---------- */
@@ -380,7 +470,7 @@ $('#main').onclick = e => {
   if (t = g('[data-t4]')) return openMovie(prof.u.top4[+t.dataset.t4]);
   if (t = g('[data-pi]')) return openMovie(prof.entries.find(z => z.id === t.dataset.pi));
   if (t = g('[data-full]')) return viewLib(t.dataset.full);
-  if (g('#swb')) return toggleShow();
+  if (g('#pset')) return openProfSet();
   if (t = g('[data-i]')) return openMovie(lib.entries.find(z => z.id === t.dataset.i));
   if (t = g('[data-tm]')) return openMovie(disc[+t.dataset.tm]);
   if (t = g('[data-p]')) return openPost(t.dataset.p);
@@ -388,6 +478,8 @@ $('#main').onclick = e => {
   if (g('#mig')) return migrate();
 };
 $('#main').onchange = e => { if (e.target.id === 'sort') { sort = e.target.value; render(); } if (e.target.id === 'dsrc') { dsrc = e.target.value; go('disc'); } };
+new MutationObserver(ms => ms.forEach(m => m.addedNodes.forEach(trNode))).observe(document.body, { childList: true, subtree: true });
+trNode(document.body);
 </script>
 </body>
 </html>
