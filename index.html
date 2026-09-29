@@ -97,6 +97,11 @@ textarea{min-height:80px;resize:vertical}label.ck{display:flex;gap:8px;align-ite
 .prof2{display:flex;align-items:flex-end;gap:16px;margin:-44px 20px 0;position:relative;flex-wrap:wrap}
 .prof2 .pi{flex:1;min-width:200px;padding-top:48px}.av.big{width:96px;height:96px;font-size:40px;border:4px solid var(--bg)}
 #gear{font-size:16px;padding:6px 10px}
+.banner.edit{position:relative;cursor:pointer;overflow:hidden}
+.ov2{position:absolute;inset:0;display:grid;place-items:center;background:#0009;color:#fff;font-weight:500;opacity:0;transition:.15s;border-radius:inherit}
+.banner.edit:hover .ov2,.avw:hover .ov2{opacity:1}
+.avw{position:relative;cursor:pointer;border-radius:50%;flex:none}
+@media(hover:none){.banner.edit .ov2{opacity:1;background:transparent;place-items:end;padding:10px;text-shadow:0 1px 4px #000}}
 </style>
 </head>
 <body>
@@ -418,23 +423,41 @@ function rProf() {
   const { u, entries, banner } = prof, mp = u.uid === me.uid, hide = !mp && u.showWatched === false, en = hide ? entries.filter(e => !e.watched) : entries, top = u.top4 || [];
   const showRev = mp || u.showReviews !== false, showTop = mp || u.showTop4 !== false, bn = safeImg(banner);
   const revs = en.filter(e => e.comment?.trim()).sort((a, b) => (b.watchedAt || b.createdAt || '').localeCompare(a.watchedAt || a.createdAt || ''));
-  $('#main').innerHTML = `<div class="banner" ${bn ? `style="background-image:url(${bn})"` : ''}></div>
-<div class="prof2">${avHtml(u, 'big')}<div class="pi"><h1 class="sec" style="margin:0 0 4px">${esc(u.name)}</h1><p class="meta" style="margin:0"><span>${u.role === 'admin' ? 'Адмін' : 'Учасник'}</span>${hide ? '' : ` · переглянуто: ${en.filter(e => e.watched).length}`}</p>${u.bio ? `<p class="over" style="margin:8px 0 0">${esc(u.bio)}</p>` : ''}</div>${mp ? '<button class="btn" id="pset">⚙ Налаштування профілю</button>' : ''}</div>
+  $('#main').innerHTML = `<div class="banner ${mp ? 'edit' : ''}" ${mp ? 'data-chb="1"' : ''} ${bn ? `style="background-image:url(${bn})"` : ''}>${mp ? '<span class="ov2">📷 Змінити банер</span>' : ''}</div>
+<div class="prof2">${mp ? `<div class="avw" data-cha="1">${avHtml(u, 'big')}<span class="ov2">📷</span></div>` : avHtml(u, 'big')}<div class="pi"><h1 class="sec" style="margin:0 0 4px">${esc(u.name)}</h1><p class="meta" style="margin:0"><span>${u.role === 'admin' ? 'Адмін' : 'Учасник'}</span>${hide ? '' : ` · переглянуто: ${en.filter(e => e.watched).length}`}</p>${u.bio ? `<p class="over" style="margin:8px 0 0">${esc(u.bio)}</p>` : ''}</div>${mp ? '<button class="btn" id="pset">⚙ Налаштування профілю</button>' : ''}</div>
 <h2 class="sub">Топ-4 улюблених</h2>${showTop ? `<div class="top4">${[0, 1, 2, 3].map(i => top[i] ? `<div class="t4" data-t4="${i}"><img src="${esc(top[i].poster)}" alt="${esc(top[i].title)}">${mp ? `<span class="rm" data-rm="${i}">×</span>` : ''}</div>` : `<div class="t4 e4">${mp ? 'Познач переглянутий фільм кнопкою «★ У топ-4»' : '—'}</div>`).join('')}</div>` : '<p class="meta">Учасник приховав свій Топ-4.</p>'}
 <h2 class="sub">Рецензії</h2>${showRev ? (revs.length ? revs.map(e => `<div class="rv" data-pi="${e.id}"><img src="${esc(e.poster)}" alt=""><div><b>${esc(e.title)}</b> <span class="yr">${esc(e.year)}</span>${num(e.rating) >= 0 ? ` <span class="star">★ ${esc(e.rating.split('/')[0])}</span>` : ''}<p>${esc(e.comment)}</p></div></div>`).join('') : '<p class="meta">Поки немає рецензій.</p>') : '<p class="meta">Учасник приховав рецензії.</p>'}
 <div class="gap" style="max-width:280px;margin-top:20px"><button class="btn red" data-full="${u.uid}">Уся бібліотека</button></div>`;
 }
+const pickImage = (w, h) => new Promise(res => {
+  const i = document.createElement('input'); i.type = 'file'; i.accept = 'image/*';
+  i.onchange = async () => { try { res(i.files[0] ? await shrink(i.files[0], w, h) : null); } catch { toast('Не вдалося прочитати зображення'); res(null); } };
+  i.click();
+});
+async function changeImg(kind) {
+  const img = await pickImage(kind === 'banner' ? 1200 : 256, kind === 'banner' ? 360 : 256); if (!img) return;
+  try {
+    if (kind === 'banner') { await setDoc(doc(db, 'users', me.uid, 'meta', 'banner'), { data: img }); prof.banner = img; }
+    else { await updateDoc(doc(db, 'users', me.uid), { avatar: img }); me.avatar = img; setAv($('#uav'), me); }
+    render(); toast('Збережено');
+  } catch (e) { toast('Помилка збереження: ' + e.message); }
+}
 function openProfSet() {
-  const P = { name: me.name, bio: me.bio || '', avatar: me.avatar || '', banner: prof.banner || '', showReviews: me.showReviews !== false, showTop4: me.showTop4 !== false, showWatched: me.showWatched !== false };
-  sheet(`<div class="pad"><h2>Налаштування профілю</h2><p class="meta">Ім'я</p><input id="pn" maxlength="30" value="${esc(P.name)}">
-<p class="meta" style="margin-top:10px">Про себе</p><textarea id="pbio" maxlength="200">${esc(P.bio)}</textarea>
-<div class="togs" style="margin-top:10px"><label class="btn">🖼 Аватар<input type="file" id="pa" accept="image/*" hidden></label><label class="btn">🏞 Банер<input type="file" id="pbn" accept="image/*" hidden></label><button class="btn" id="pra">Прибрати аватар</button><button class="btn" id="prb">Прибрати банер</button></div>
+  const P = { avatar: me.avatar || '', banner: prof.banner || '', showReviews: me.showReviews !== false, showTop4: me.showTop4 !== false, showWatched: me.showWatched !== false };
+  sheet(`<div class="pad"><h2>Налаштування профілю</h2>
+<div class="banner" id="pvb" style="height:110px"></div><div class="av" id="pva" style="width:64px;height:64px;font-size:26px;border:3px solid var(--s1);margin:-32px 0 12px 16px;position:relative"></div>
+<p class="meta">Ім'я</p><input id="pn" maxlength="30" value="${esc(me.name)}">
+<p class="meta" style="margin-top:10px">Про себе</p><textarea id="pbio" maxlength="200">${esc(me.bio || '')}</textarea>
+<div class="togs" style="margin-top:10px"><button class="btn" id="pa">🖼 Аватар</button><button class="btn" id="pbn">🏞 Банер</button><button class="btn" id="pra">Прибрати аватар</button><button class="btn" id="prb">Прибрати банер</button></div>
 <p class="meta" id="pmsg"></p><div class="togs" id="pt">${[['showReviews', 'Рецензії видно всім'], ['showTop4', 'Топ-4 видно всім'], ['showWatched', 'Переглянуті видно всім']].map(([k, n]) => `<button class="tog ${P[k] ? 'on' : ''}" data-k="${k}">${n}</button>`).join('')}</div>
 <div class="gap"><button class="btn red" id="ps">Зберегти</button></div></div>`);
-  const pick = (id, key, w, h) => $(id).onchange = async e => { const f = e.target.files[0]; if (!f) return; try { P[key] = await shrink(f, w, h); $('#pmsg').textContent = 'Зображення обрано. Натисни «Зберегти».'; } catch { toast('Не вдалося прочитати зображення'); } };
-  pick('#pa', 'avatar', 256, 256); pick('#pbn', 'banner', 1200, 360);
-  $('#pra').onclick = () => { P.avatar = ''; $('#pmsg').textContent = 'Аватар буде прибрано. Натисни «Зберегти».'; };
-  $('#prb').onclick = () => { P.banner = ''; $('#pmsg').textContent = 'Банер буде прибрано. Натисни «Зберегти».'; };
+  const pv = () => { const b = safeImg(P.banner); $('#pvb').style.backgroundImage = b ? `url(${b})` : ''; setAv($('#pva'), { avatar: P.avatar, name: $('#pn').value || me.name }); };
+  const note = () => $('#pmsg').textContent = 'Натисни «Зберегти», щоб застосувати.';
+  pv(); $('#pn').oninput = pv;
+  $('#pa').onclick = async () => { const i = await pickImage(256, 256); if (i) { P.avatar = i; pv(); note(); } };
+  $('#pbn').onclick = async () => { const i = await pickImage(1200, 360); if (i) { P.banner = i; pv(); note(); } };
+  $('#pra').onclick = () => { P.avatar = ''; pv(); note(); };
+  $('#prb').onclick = () => { P.banner = ''; pv(); note(); };
   $('#pt').onclick = e => { const b = e.target.closest('[data-k]'); if (!b) return; P[b.dataset.k] = !P[b.dataset.k]; b.classList.toggle('on', P[b.dataset.k]); };
   $('#ps').onclick = async () => {
     try {
@@ -442,7 +465,7 @@ function openProfSet() {
       await updateDoc(doc(db, 'users', me.uid), d);
       if (P.banner !== (prof.banner || '')) await setDoc(doc(db, 'users', me.uid, 'meta', 'banner'), { data: P.banner });
       Object.assign(me, d); prof.banner = P.banner; $('#uname').textContent = me.name; setAv($('#uav'), me); closeSheet(); render(); toast('Збережено');
-    } catch (e) { toast('Помилка: ' + e.message); }
+    } catch (e) { toast('Помилка збереження: ' + e.message); }
   };
 }
 function openApp() {
@@ -470,6 +493,8 @@ $('#main').onclick = e => {
   if (t = g('[data-t4]')) return openMovie(prof.u.top4[+t.dataset.t4]);
   if (t = g('[data-pi]')) return openMovie(prof.entries.find(z => z.id === t.dataset.pi));
   if (t = g('[data-full]')) return viewLib(t.dataset.full);
+  if (g('[data-cha]')) return changeImg('avatar');
+  if (g('[data-chb]')) return changeImg('banner');
   if (g('#pset')) return openProfSet();
   if (t = g('[data-i]')) return openMovie(lib.entries.find(z => z.id === t.dataset.i));
   if (t = g('[data-tm]')) return openMovie(disc[+t.dataset.tm]);
