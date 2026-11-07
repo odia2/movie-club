@@ -115,6 +115,16 @@ textarea{min-height:80px;resize:vertical}label.ck{display:flex;gap:8px;align-ite
 .cbubble.nc{padding:0;background:none}
 .t4:hover .cbubble.nc,.t4:focus-visible .cbubble.nc{padding:30px 9px 8px}
 @media(max-width:640px){.top4{grid-template-columns:repeat(2,1fr)}}
+/* --- пошук у бібліотеці --- */
+.ls{position:relative;flex:1 1 280px;min-width:200px;max-width:520px;display:block}
+.ls input{margin:0;height:38px;padding:8px 36px 8px 38px;background:var(--s1);border:1px solid var(--line);border-radius:8px;font-size:14px;transition:border-color .15s,box-shadow .15s}
+.ls input:focus{outline:none;border-color:var(--ac);box-shadow:0 0 0 3px color-mix(in srgb,var(--ac) 25%,transparent)}
+.ls svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--mut);pointer-events:none}
+.lsx{position:absolute;right:7px;top:50%;transform:translateY(-50%);width:24px;height:24px;border-radius:50%;color:var(--mut);font-size:17px;line-height:1;display:grid;place-items:center}
+.lsx:hover{background:var(--s2);color:var(--tx)}
+.bar.b1{margin-bottom:14px}.bar.b1 select,.bar.b1 .btn{height:38px}
+#lcnt{margin:-6px 0 14px}#lcnt b{color:var(--tx)}
+@media(max-width:700px){.ls{flex:1 1 100%;max-width:none}}
 /* --- галерея кадрів --- */
 .gal{margin:14px 0 4px}.gal-tabs{display:flex;gap:8px;align-items:center;margin-bottom:8px}
 .gal-tabs .tab{padding:5px 12px;font-size:13px}
@@ -223,7 +233,7 @@ const DICT = {
 '· адмін':['· админ','· admin'],'· учасник':['· участник','· member'],'· очікує підтвердження':['· ждёт подтверждения','· pending approval'],'Підтвердити':['Подтвердить','Approve'],'Заблокувати':['Заблокировать','Block'],
 'Познач переглянутий фільм кнопкою «★ У топ-4»':['Отметь просмотренный фильм кнопкой «★ В топ-4»','Mark a watched movie with \"★ Add to top 4\"'],'Учасник приховав свій Топ-4.':['Участник скрыл свой Топ-4.','User hid their Top 4.'],'Учасник приховав рецензії.':['Участник скрыл рецензии.','User hid their reviews.'],
 'У топ-4 можна додати лише переглянутий фільм':['В топ-4 можно добавить только просмотренный фильм','Only watched movies can be added to the top 4'],'У топ-4 вже 4 фільми. Прибери один у профілі':['В топ-4 уже 4 фильма. Убери один в профиле','Top 4 is full. Remove one in your profile'],'У «Дивлюсь зараз» вже 4 фільми. Прибери один у профілі':['В «Сейчас смотрю» уже 4 фильма. Убери один в профиле','\"Watching now\" is full. Remove one in your profile'],
-'♡ Улюблений':['♡ Любимый','♡ Favorite'],'☆ У топ-4':['☆ В топ-4','☆ Add to top 4'],'Кадри':['Кадры','Stills'],'Постери':['Постеры','Posters'],
+'♡ Улюблений':['♡ Любимый','♡ Favorite'],'☆ У топ-4':['☆ В топ-4','☆ Add to top 4'],'Пошук у бібліотеці…':['Поиск по библиотеке…','Search library…'],'Знайдено':['Найдено','Found'],'Нічого не знайдено':['Ничего не найдено','Nothing found'],'Тут поки порожньо. Знайди фільм у пошуку зверху або у вкладці «Відкрити».':['Здесь пока пусто. Найди фильм через поиск сверху или во вкладке «Открыть».','Nothing here yet. Find a movie with the search above or in "Discover".'],'Кадри':['Кадры','Stills'],'Постери':['Постеры','Posters'],
 'Топ-4 улюблених':['Топ-4 любимых','Top 4 favorites'],'Дивлюсь зараз':['Сейчас смотрю','Watching now'],'▶ Дивлюсь зараз':['▶ Сейчас смотрю','▶ Watching now'],
 'У «Дивлюсь зараз» вже 4 фільми':['В «Сейчас смотрю» уже 4 фильма','Already 4 items in "Watching now"'],
 'Познач фільм кнопкою «▶ Дивлюсь зараз»':['Отметь фильм кнопкой «▶ Сейчас смотрю»','Mark movie with "▶ Watching now"'],
@@ -255,7 +265,7 @@ const TABS = [['all','Всі'],['watched','Подивився'],['watchlist','Х
 const DSRC = [['trending/all/week','В тренді'],['movie/top_rated','Топ фільмів'],['tv/top_rated','Топ серіалів'],['movie/now_playing','Зараз у кіно']];
 const TAGS = ['Питання','Порада','Рецензія','Обговорення'];
 const inLib = (e, l) => l === 'all' || (l === 'watched' ? e.watched : l === 'movie' ? isM(e) : l === 'tv' ? e.type === 'tv' : !!e.libraries?.includes(l));
-let me, mine = [], lib = {}, view = 'lib', filter = 'all', sort = 'new', posts = [], tag = 'Усі', users = [], disc = [], dsrc = DSRC[0][0], tok = 0, trk = null, signup = false, nameHint = '', prof = null, home = [];
+let me, mine = [], lib = {}, view = 'lib', filter = 'all', sort = 'new', posts = [], tag = 'Усі', users = [], disc = [], dsrc = DSRC[0][0], tok = 0, trk = null, signup = false, nameHint = '', prof = null, home = [], libq = '';
 const RSS_KEY = ''; // необов'язково: безкоштовний ключ з rss2json.com, якщо новини не вантажаться
 const HOME = [['trending/all/week', 'Топ-15 тижня', 15, 1], ['movie/now_playing', 'Зараз у кіно', 12], ['movie/upcoming', 'Скоро в кіно', 12], ['tv/popular', 'Популярні серіали', 12]];
 const isAd = () => me?.role === 'admin' || me?.isAdmin === true, own = () => lib.uid === me.uid;
@@ -334,7 +344,7 @@ const loadEntries = async uid => (await getDocs(collection(db, 'users', uid, 'en
 document.querySelector('.logo').onclick = () => go('home'); $('#gear').onclick = () => openApp(); $('#uav').onclick = () => viewProf(me.uid); $('#uav').style.cursor = 'pointer';
 
 /* ---------- navigation ---------- */
-document.querySelector('.nav').onclick = e => { const b = e.target.closest('[data-v]'); if (!b) return; if (b.dataset.v === 'prof') return viewProf(me.uid); if (b.dataset.v === 'lib') lib = { uid: me.uid, name: me.name, entries: mine }; go(b.dataset.v); };
+document.querySelector('.nav').onclick = e => { const b = e.target.closest('[data-v]'); if (!b) return; if (b.dataset.v === 'prof') return viewProf(me.uid); if (b.dataset.v === 'lib') { lib = { uid: me.uid, name: me.name, entries: mine }; libq = ''; } go(b.dataset.v); };
 async function go(v) {
   view = v; const nv = v === 'prof' ? (prof.u.uid === me.uid ? 'prof' : 'mem') : v === 'lib' && lib.uid !== me.uid ? 'mem' : v; document.querySelectorAll('.nav button').forEach(b => b.classList.toggle('on', b.dataset.v === nv));
   $('#main').innerHTML = '<div class="empty">Завантаження…</div>';
@@ -356,18 +366,47 @@ const card = (e, attr, score) => {
 };
 
 /* ---------- library ---------- */
+const LSORT = {
+  new: (a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''), rd: (a, b) => num(b.rating) - num(a.rating), ra: (a, b) => num(a.rating) - num(b.rating),
+  yd: (a, b) => (b.year || 0) - (a.year || 0), ya: (a, b) => (a.year || 0) - (b.year || 0), t: (a, b) => (a.title || '').localeCompare(b.title || '')
+};
+// нормалізація для пошуку: регістр, ё/е, і/и/ї, апострофи, діакритика, розділові знаки
+const nrm = s => String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/ё/g, 'е').replace(/[іїи]/g, 'и').replace(/є/g, 'е').replace(/ґ/g, 'г').replace(/[’'ʼ`´]/g, '').replace(/[^\p{L}\p{N}\s]/gu, ' ').replace(/\s+/g, ' ').trim();
+function libList() {
+  const E = lib.entries, q = nrm(libq).split(' ').filter(Boolean);
+  const list = q.length ? E.filter(e => { const h = nrm((e.title || '') + ' ' + (e.year || '')); return q.every(w => h.includes(w)); }) : E.filter(e => inLib(e, filter));
+  return list.sort(LSORT[sort]);
+}
+function paintLib() {
+  const g = $('#lg'); if (!g) return;
+  const list = libList(), q = libq.trim();
+  g.innerHTML = list.length ? list.map(e => card(e, `data-i="${e.id}"`)).join('')
+    : q ? `<div class="empty"><span>Нічого не знайдено</span><br><small>«${esc(q)}»</small></div>`
+    : '<div class="empty">Тут поки порожньо. Знайди фільм у пошуку зверху або у вкладці «Відкрити».</div>';
+  document.querySelectorAll('.tabs .tab').forEach(b => b.classList.toggle('on', !q && b.dataset.tab === filter));
+  const c = $('#lcnt'); if (c) { c.style.display = q ? '' : 'none'; $('#lcn').textContent = `${list.length} / ${lib.entries.length}`; }
+  const x = $('#lqx'); if (x) x.style.display = q ? '' : 'none';
+}
 function rLib() {
-  const E = lib.entries, f = {
-    new: (a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''), rd: (a, b) => num(b.rating) - num(a.rating), ra: (a, b) => num(a.rating) - num(b.rating),
-    yd: (a, b) => (b.year || 0) - (a.year || 0), ya: (a, b) => (a.year || 0) - (b.year || 0), t: (a, b) => (a.title || '').localeCompare(b.title || '')
-  }[sort], list = E.filter(e => inLib(e, filter)).sort(f), rated = E.map(e => num(e.rating)).filter(n => n > 0);
+  const E = lib.entries, rated = E.map(e => num(e.rating)).filter(n => n > 0);
   const st = [['Всього', E.length], ['Фільми', E.filter(isM).length], ['Серіали', E.filter(e => e.type === 'tv').length], ['Подивився', E.filter(e => e.watched).length, 'ok'], ['Середня оцінка', rated.length ? (rated.reduce((a, b) => a + b) / rated.length).toFixed(1) : '—', 'gold']];
   $('#main').innerHTML = `<h1 class="sec">${own() ? 'Моя бібліотека' : 'Бібліотека: ' + esc(lib.name)}</h1>${lib.hid ? '<p class="meta">Учасник приховав свої переглянуті фільми.</p>' : ''}
 <div class="stats">${st.map(([n, v, c]) => `<div class="stat ${c || ''}">${n}<b>${v}</b></div>`).join('')}</div>
-<div class="bar"><div class="tabs">${TABS.map(([k, n]) => `<button class="tab ${k === filter ? 'on' : ''}" data-tab="${k}">${n}<span>${E.filter(e => inLib(e, k)).length}</span></button>`).join('')}</div>
+<div class="bar b1"><label class="ls"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="lq" type="text" placeholder="Пошук у бібліотеці…" value="${esc(libq)}" autocomplete="off" spellcheck="false"><button type="button" class="lsx" id="lqx" aria-label="Очистити">×</button></label>
 <select id="sort">${[['new','Спочатку нові'],['rd','Оцінка ↓'],['ra','Оцінка ↑'],['yd','Рік ↓'],['ya','Рік ↑'],['t','Назва А–Я']].map(([k, n]) => `<option value="${k}" ${k === sort ? 'selected' : ''}>${n}</option>`).join('')}</select>
 ${own() && isAd() ? '<button class="btn" id="mig">⬇ Імпорт зі старої бази</button>' : ''}</div>
-<div class="grid">${list.length ? list.map(e => card(e, `data-i="${e.id}"`)).join('') : '<div class="empty">Тут поки порожньо. Знайди фільм у пошуку зверху або у вкладці «Відкрити».</div>'}</div>`;
+<div class="bar"><div class="tabs">${TABS.map(([k, n]) => `<button class="tab" data-tab="${k}">${n}<span>${E.filter(e => inLib(e, k)).length}</span></button>`).join('')}</div></div>
+<p class="meta" id="lcnt" style="display:none"><span>Знайдено</span>: <b id="lcn"></b></p>
+<div class="grid" id="lg"></div>`;
+  paintLib();
+}
+async function viewLib(uid) {
+  try {
+    const u = uid === me.uid ? me : (users.find(x => x.uid === uid) || prof?.u); if (!u) return;
+    let entries = uid === me.uid ? mine : await loadEntries(uid); const hid = uid !== me.uid && u.showWatched === false;
+    if (hid) entries = entries.filter(e => !e.watched);
+    lib = { uid, name: u.name, entries, hid }; libq = ''; filter = 'all'; go('lib');
+  } catch (e) { toast('Помилка: ' + e.message); }
 }
 async function migrate() {
   if (!confirm('Скопіювати всі фільми зі старої колекції movies у твою бібліотеку?')) return;
@@ -668,7 +707,8 @@ function openApp() {
 /* ---------- delegated clicks ---------- */
 $('#main').onclick = e => {
   const g = s => e.target.closest(s); let t;
-  if (t = g('[data-tab]')) { filter = t.dataset.tab; return render(); }
+  if (g('#lqx')) { libq = ''; const i = $('#lq'); if (i) { i.value = ''; i.focus(); } return paintLib(); }
+  if (t = g('[data-tab]')) { filter = t.dataset.tab; libq = ''; const i = $('#lq'); if (i) i.value = ''; return view === 'lib' ? paintLib() : render(); }
   if (t = g('[data-tag]')) { tag = t.dataset.tag; return render(); }
   if (t = g('[data-up]')) return vote(t.dataset.up);
   if (t = g('[data-ap]')) return setApproved(t.dataset.ap, t.dataset.v === '1');
@@ -688,6 +728,7 @@ $('#main').onclick = e => {
   if (g('#np')) return openNew();
   if (g('#mig')) return migrate();
 };
+$('#main').oninput = e => { if (e.target.id === 'lq') { libq = e.target.value; paintLib(); } };
 $('#main').onchange = e => { if (e.target.id === 'sort') { sort = e.target.value; render(); } if (e.target.id === 'dsrc') { dsrc = e.target.value; go('disc'); } };
 new MutationObserver(ms => ms.forEach(m => m.addedNodes.forEach(trNode))).observe(document.body, { childList: true, subtree: true });
 trNode(document.body);
