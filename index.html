@@ -63,7 +63,17 @@ select,.btn{padding:8px 14px;background:var(--s1);border:1px solid var(--line);b
 .x{position:absolute;top:12px;right:14px;z-index:2;width:38px;height:38px;border-radius:50%;background:#000a;font-size:22px}
 .bd{height:170px;background:var(--s2) center/cover;position:relative}.bd:after{content:'';position:absolute;inset:0;background:linear-gradient(transparent 30%,var(--s1))}
 .mh{display:flex;gap:26px;padding:0 26px 26px;margin-top:-80px;position:relative}
-.mh>img{width:200px;height:300px;object-fit:cover;border-radius:8px;flex:none;background:var(--s2);box-shadow:0 12px 30px #000a}
+.pc{width:200px;flex:none;display:flex;flex-direction:column;gap:14px}
+.pc>img{width:200px;height:300px;object-fit:cover;border-radius:8px;background:var(--s2);box-shadow:0 12px 30px #000a}
+.qa{display:flex;flex-direction:column;gap:8px}
+.qb{display:flex;align-items:center;gap:6px;width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--line);background:var(--s2);color:var(--tx);font-size:14px;font-weight:500;text-align:left;transition:background .18s,border-color .18s,color .18s,transform .12s}
+.qb:hover{border-color:var(--ac2)}.qb:active{transform:scale(.97)}
+.qb.on{background:var(--ac);border-color:var(--ac);color:#fff}
+.qb.c.on:after{content:'';width:8px;height:8px;border-radius:50%;background:currentColor;margin-left:auto;animation:pls 1.4s ease-in-out infinite}
+@keyframes pls{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.7)}}
+.qb.f:hover{border-color:#fb7185}
+.qb.f.on{background:color-mix(in srgb,#f43f5e 16%,var(--s1));border-color:color-mix(in srgb,#f43f5e 55%,transparent);color:#fb7185}
+[data-theme=light] .qb.f.on{color:#e11d48}
 .mi{flex:1;padding-top:88px;min-width:0}.mi h2,.pad h2{font-size:28px;line-height:1.15;margin-bottom:6px}
 .over{line-height:1.6;font-size:15px;margin-bottom:14px}.row{display:flex;gap:10px;margin-bottom:12px}
 .box{background:var(--bg);border-radius:8px;padding:14px;margin-top:14px}.box h3{font-size:13px;color:var(--mut);margin-bottom:10px;font-weight:500}
@@ -73,7 +83,7 @@ textarea{min-height:80px;resize:vertical}label.ck{display:flex;gap:8px;align-ite
 .dlg{max-width:420px;margin:8vh auto;background:var(--s1);padding:26px;border-radius:12px}.dlg h2{margin-bottom:12px}
 .gap{display:flex;gap:10px;margin-top:14px}.gap>*{flex:1}.pad{padding:26px}.cmt{border-top:1px solid var(--line);padding:10px 0;font-size:14px}
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--tx);color:var(--bg);padding:12px 20px;border-radius:8px;font-weight:600;z-index:400;transition:.25s;pointer-events:none}#toast.show{transform:translateX(-50%)}
-@media(max-width:640px){.user span{display:none}.mh{flex-direction:column;align-items:center;margin-top:-60px}.mi{padding-top:0;width:100%}.mh>img{width:140px;height:210px}.grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}}
+@media(max-width:640px){.user span{display:none}.mh{flex-direction:column;align-items:center;margin-top:-60px}.mi{padding-top:0;width:100%}.pc{width:min(100%,320px);align-items:center}.pc>img{width:140px;height:210px}.qa{width:100%;display:grid;grid-template-columns:1fr 1fr}.grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}}
 .togs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
 .tog{padding:9px 14px;border-radius:999px;border:1px solid var(--line);background:var(--s1);font-size:14px}
 .tog.on{background:var(--ac);border-color:var(--ac);color:#fff}
@@ -213,7 +223,7 @@ const DICT = {
 '· адмін':['· админ','· admin'],'· учасник':['· участник','· member'],'· очікує підтвердження':['· ждёт подтверждения','· pending approval'],'Підтвердити':['Подтвердить','Approve'],'Заблокувати':['Заблокировать','Block'],
 'Познач переглянутий фільм кнопкою «★ У топ-4»':['Отметь просмотренный фильм кнопкой «★ В топ-4»','Mark a watched movie with \"★ Add to top 4\"'],'Учасник приховав свій Топ-4.':['Участник скрыл свой Топ-4.','User hid their Top 4.'],'Учасник приховав рецензії.':['Участник скрыл рецензии.','User hid their reviews.'],
 'У топ-4 можна додати лише переглянутий фільм':['В топ-4 можно добавить только просмотренный фильм','Only watched movies can be added to the top 4'],'У топ-4 вже 4 фільми. Прибери один у профілі':['В топ-4 уже 4 фильма. Убери один в профиле','Top 4 is full. Remove one in your profile'],'У «Дивлюсь зараз» вже 4 фільми. Прибери один у профілі':['В «Сейчас смотрю» уже 4 фильма. Убери один в профиле','\"Watching now\" is full. Remove one in your profile'],
-'Кадри':['Кадры','Stills'],'Постери':['Постеры','Posters'],
+'♡ Улюблений':['♡ Любимый','♡ Favorite'],'☆ У топ-4':['☆ В топ-4','☆ Add to top 4'],'Кадри':['Кадры','Stills'],'Постери':['Постеры','Posters'],
 'Топ-4 улюблених':['Топ-4 любимых','Top 4 favorites'],'Дивлюсь зараз':['Сейчас смотрю','Watching now'],'▶ Дивлюсь зараз':['▶ Сейчас смотрю','▶ Watching now'],
 'У «Дивлюсь зараз» вже 4 фільми':['В «Сейчас смотрю» уже 4 фильма','Already 4 items in "Watching now"'],
 'Познач фільм кнопкою «▶ Дивлюсь зараз»':['Отметь фильм кнопкой «▶ Сейчас смотрю»','Mark movie with "▶ Watching now"'],
@@ -404,52 +414,59 @@ function rDisc() {
 async function openMovie(o) {
   const id = eid(o.type, o.tmdb_id), ex = mine.find(z => z.id === id), th = view === 'lib' && !own() ? lib.entries.find(z => z.id === id) : null, ep = o.type === 'tv' ? 'tv' : 'movie';
   const S = { w: !!ex?.watched, b: !!ex?.libraries?.includes('watchlist'), f: !!ex?.libraries?.includes('favorites'), t: !!me.top4?.some(x => x.id === id), c: !!me.watching?.some(x => x.id === id) };
-  sheet(`<div class="bd" id="bd"></div><div class="mh"><img src="${esc(o.poster)}" alt=""><div class="mi"><h2>${esc(o.title)}</h2><p class="meta" id="mm">${esc(o.year)} · ${ep === 'tv' ? 'Серіал' : 'Фільм'}</p>
+  const QL = { w: ['👁 Подивився', '👁 Подивився'], b: ['🔖 Хочу подивитись', '🔖 Хочу подивитись'], c: ['▶ Дивлюсь зараз', '▶ Дивлюсь зараз'], f: ['♡ Улюблений', '♥ Улюблений'], t: ['☆ У топ-4', '★ У топ-4'] };
+  const qaHtml = () => ['w', 'b', 'c', 'f', 't'].map(k => `<button type="button" class="qb ${k} ${S[k] ? 'on' : ''}" data-t="${k}" aria-pressed="${S[k]}">${QL[k][S[k] ? 1 : 0]}</button>`).join('');
+  sheet(`<div class="bd" id="bd"></div><div class="mh"><div class="pc"><img src="${esc(o.poster)}" alt=""><div class="qa" id="qa">${qaHtml()}</div></div><div class="mi"><h2>${esc(o.title)}</h2><p class="meta" id="mm">${esc(o.year)} · ${ep === 'tv' ? 'Серіал' : 'Фільм'}</p>
 <p class="over" id="mo">Завантаження…</p><p class="meta" id="mc"></p><div class="row"><button class="btn" id="tb">▶ Трейлер</button></div><div class="tbx" id="tbx"></div><div id="gal"></div>
 ${th ? `<div class="box"><h3>Оцінка: ${esc(lib.name)}</h3><p>★ ${esc(th.rating || 'N/A')}</p><p class="over">${esc(th.comment || '')}</p></div>` : ''}
 <div class="box"><h3>Мій запис</h3>
-<div class="togs" id="tg">${[['w', '👁 Подивився'], ['b', '🔖 Хочу подивитись'], ['c', '▶ Дивлюсь зараз'], ['f', '♥ Улюблений'], ['t', '★ У топ-4']].map(([k, n]) => `<button type="button" class="tog ${S[k] ? 'on' : ''}" data-t="${k}">${n}</button>`).join('')}</div>
 <input type="number" id="fr" min="0" max="13" step="0.1" placeholder="Моя оцінка з 10" value="${ex && num(ex.rating) >= 0 ? num(ex.rating) : ''}">
 <textarea id="fc" placeholder="Мій коментар або рецензія">${esc(ex?.comment || '')}</textarea>
-<div class="gap"><button class="btn red" id="fs">Зберегти</button>${ex ? '<button class="btn" id="fd">Видалити</button>' : ''}</div></div><div id="sim"></div></div></div>`);
+<div class="gap"><button class="btn red" id="fs">Зберегти</button><button class="btn" id="fd" ${ex ? '' : 'style="display:none"'}>Видалити</button></div></div><div id="sim"></div></div></div>`);
   const t = tok; trk = null;
-  $('#tg').onclick = e => {
-    const b = e.target.closest('[data-t]'); if (!b) return; const k = b.dataset.t;
+  const cur = () => mine.find(z => z.id === id);
+  const persist = async useForm => {
+    const c = cur(), none = !S.w && !S.b && !S.c && !S.f && !S.t;
+    const rating = useForm ? ratingStr($('#fr').value) : (c?.rating || 'N/A'), comment = useForm ? $('#fc').value : (c?.comment || '');
+    if (!useForm && none && !comment.trim() && num(rating) < 0) {
+      if (c) await deleteDoc(doc(db, 'users', me.uid, 'entries', id));
+      await dropTop(id); await dropWatching(id);
+      mine = mine.filter(z => z.id !== id); if (own()) lib.entries = mine; return;
+    }
+    const l = ['all']; if (S.b) l.push('watchlist'); if (S.f) l.push('favorites');
+    const data = { tmdb_id: String(o.tmdb_id), type: o.type || 'movie', title: o.title || '', poster: o.poster || '', year: o.year || '—', rating, comment, watched: S.w, libraries: l, createdAt: c?.createdAt || iso() };
+    if (S.w) data.watchedAt = c?.watchedAt || iso();
+    await setDoc(doc(db, 'users', me.uid, 'entries', id), data);
+    mine = [...mine.filter(z => z.id !== id), { id, ...data }]; if (own()) lib.entries = mine;
+    const snap = { id, tmdb_id: data.tmdb_id, type: data.type, title: data.title, poster: data.poster, year: data.year, rating, comment };
+    const up = (arr, on) => { arr = arr || []; const i = arr.findIndex(x => x.id === id); if (!on) return i < 0 ? arr : arr.filter(x => x.id !== id); if (i >= 0) { const a = [...arr]; a[i] = snap; return a; } return [...arr, snap]; };
+    const top = up(me.top4, S.t && S.w), watching = up(me.watching, S.c);
+    if (JSON.stringify(top) !== JSON.stringify(me.top4 || [])) { await updateDoc(doc(db, 'users', me.uid), { top4: top }); me.top4 = top; }
+    if (JSON.stringify(watching) !== JSON.stringify(me.watching || [])) { await updateDoc(doc(db, 'users', me.uid), { watching }); me.watching = watching; }
+  };
+  const qa = $('#qa'); let busy = false;
+  qa.onclick = async e => {
+    const b = e.target.closest('[data-t]'); if (!b || busy) return; const k = b.dataset.t;
     if (k === 't' && !S.w) return toast('У топ-4 можна додати лише переглянутий фільм');
     if (k === 't' && !S.t && (me.top4 || []).length >= 4) return toast('У топ-4 вже 4 фільми. Прибери один у профілі');
     if (k === 'c' && !S.c && (me.watching || []).length >= 4) return toast('У «Дивлюсь зараз» вже 4 фільми. Прибери один у профілі');
+    const prev = { ...S };
     S[k] = !S[k];
-    if (k === 'w' && S.w) { S.b = false; S.c = false; }
-    if (k === 'w' && !S.w) S.t = false;
+    if (k === 'w' && S.w) { S.b = false; S.c = false; }   // подивився → вже не «хочу» і не «дивлюсь»
+    if (k === 'w' && !S.w) S.t = false;                    // зняв «подивився» → зникає з топ-4
     if (k === 'b' && S.b) { S.w = false; S.t = false; S.c = false; }
     if (k === 'c' && S.c) { S.w = false; S.t = false; S.b = false; }
-    $('#tg').querySelectorAll('[data-t]').forEach(x => x.classList.toggle('on', S[x.dataset.t]));
+    qa.innerHTML = qaHtml(); busy = true;
+    try { await persist(false); render(); const d = $('#fd'); if (d && t === tok) d.style.display = cur() ? '' : 'none'; }
+    catch (err) { Object.assign(S, prev); qa.innerHTML = qaHtml(); toast('Помилка збереження: ' + err.message); }
+    busy = false;
   };
   $('#tb').onclick = () => trk ? $('#tbx').innerHTML = `<iframe src="https://www.youtube.com/embed/${trk}?autoplay=1" allow="autoplay;fullscreen" allowfullscreen></iframe>` : toast('Трейлер не знайдено');
-  $('#fs').onclick = async () => {
-    try {
-      const l = ['all']; if (S.b) l.push('watchlist'); if (S.f) l.push('favorites');
-      const data = { tmdb_id: String(o.tmdb_id), type: o.type || 'movie', title: o.title || '', poster: o.poster || '', year: o.year || '—', rating: ratingStr($('#fr').value), comment: $('#fc').value, watched: S.w, libraries: l, createdAt: ex?.createdAt || iso() };
-      if (S.w) data.watchedAt = ex?.watchedAt || iso();
-      await setDoc(doc(db, 'users', me.uid, 'entries', id), data);
-      mine = [...mine.filter(z => z.id !== id), { id, ...data }]; if (own()) lib.entries = mine;
-
-      const top = (me.top4 || []).filter(x => x.id !== id);
-      if (S.t && S.w) top.push({ id, tmdb_id: data.tmdb_id, type: data.type, title: data.title, poster: data.poster, year: data.year, rating: data.rating, comment: data.comment });
-      if (JSON.stringify(top) !== JSON.stringify(me.top4 || [])) { await updateDoc(doc(db, 'users', me.uid), { top4: top }); me.top4 = top; }
-
-      const watching = (me.watching || []).filter(x => x.id !== id);
-      if (S.c) watching.push({ id, tmdb_id: data.tmdb_id, type: data.type, title: data.title, poster: data.poster, year: data.year, rating: data.rating, comment: data.comment });
-      if (JSON.stringify(watching) !== JSON.stringify(me.watching || [])) { await updateDoc(doc(db, 'users', me.uid), { watching }); me.watching = watching; }
-
-      closeSheet(); render(); toast('Збережено');
-    } catch (e) { toast('Помилка збереження: ' + e.message); }
-  };
-  if (ex) $('#fd').onclick = async () => {
+  $('#fs').onclick = async () => { try { await persist(true); closeSheet(); render(); toast('Збережено'); } catch (e) { toast('Помилка збереження: ' + e.message); } };
+  $('#fd').onclick = async () => {
     if (!confirm('Видалити з бібліотеки?')) return;
     await deleteDoc(doc(db, 'users', me.uid, 'entries', id));
-    await dropTop(id);
-    await dropWatching(id);
+    await dropTop(id); await dropWatching(id);
     mine = mine.filter(z => z.id !== id);
     if (own()) lib.entries = mine;
     closeSheet(); render(); toast('Видалено');
