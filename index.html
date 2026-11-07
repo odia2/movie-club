@@ -68,7 +68,6 @@ select,.btn{padding:8px 14px;background:var(--s1);border:1px solid var(--line);b
 .over{line-height:1.6;font-size:15px;margin-bottom:14px}.row{display:flex;gap:10px;margin-bottom:12px}
 .box{background:var(--bg);border-radius:8px;padding:14px;margin-top:14px}.box h3{font-size:13px;color:var(--mut);margin-bottom:10px;font-weight:500}
 .tbx iframe{width:100%;aspect-ratio:16/9;border:0;border-radius:8px;margin-bottom:12px}
-.simr{display:flex;gap:8px;overflow-x:auto;margin:8px 0}.simr img{height:110px;border-radius:5px;cursor:pointer}
 input,textarea{width:100%;padding:10px 12px;background:var(--bg);border:1px solid var(--line);border-radius:6px;margin:4px 0}
 textarea{min-height:80px;resize:vertical}label.ck{display:flex;gap:8px;align-items:center;cursor:pointer;margin:8px 0}label.ck input{width:auto;accent-color:var(--ac);margin:0}
 .dlg{max-width:420px;margin:8vh auto;background:var(--s1);padding:26px;border-radius:12px}.dlg h2{margin-bottom:12px}
@@ -109,10 +108,17 @@ textarea{min-height:80px;resize:vertical}label.ck{display:flex;gap:8px;align-ite
 /* --- галерея кадрів --- */
 .gal{margin:14px 0 4px}.gal-tabs{display:flex;gap:8px;align-items:center;margin-bottom:8px}
 .gal-tabs .tab{padding:5px 12px;font-size:13px}
-.gal-row{display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;scroll-snap-type:x proximity}
-.gal-row img{height:150px;border-radius:6px;cursor:zoom-in;flex:none;scroll-snap-align:start;background:var(--s2);transition:transform .15s,box-shadow .15s}
-.gal-row img:hover{transform:translateY(-2px);box-shadow:0 6px 16px #0007}
-.gal-row.po img{height:190px}
+.gal-row,.simr{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none;scroll-snap-type:x proximity;padding:2px 0}
+.gal-row::-webkit-scrollbar,.simr::-webkit-scrollbar{display:none}
+.gal-row img{flex:none;scroll-snap-align:start;border-radius:8px;object-fit:cover;background:var(--s2);cursor:zoom-in;user-select:none;-webkit-user-drag:none;transition:filter .2s,transform .2s}
+.gal-row.st img{width:min(290px,72vw);aspect-ratio:16/9}
+.gal-row.po img{width:min(140px,36vw);aspect-ratio:2/3}
+.gal-row img:hover{filter:brightness(1.12);transform:translateY(-2px)}
+.simr{margin:8px 0}.simr img{flex:none;width:100px;aspect-ratio:2/3;height:auto;object-fit:cover;border-radius:8px;cursor:pointer;scroll-snap-align:start;-webkit-user-drag:none;transition:transform .2s}.simr img:hover{transform:translateY(-2px)}
+.hs{position:relative}
+.hs-b{position:absolute;top:50%;transform:translateY(-50%) scale(.9);z-index:3;width:38px;height:38px;border-radius:50%;background:color-mix(in srgb,var(--bg) 88%,transparent);border:1px solid var(--line);color:var(--tx);font-size:22px;line-height:1;display:grid;place-items:center;opacity:0;pointer-events:none;transition:.2s;box-shadow:0 4px 14px #0006;backdrop-filter:blur(6px)}
+.hs-b.l{left:6px}.hs-b.r{right:6px}.hs-b:hover{background:var(--ac);border-color:var(--ac);color:#fff}
+@media(hover:hover){.hs.can-l:hover .hs-b.l,.hs.can-r:hover .hs-b.r{opacity:1;pointer-events:auto;transform:translateY(-50%)}}
 #lb{position:fixed;inset:0;z-index:300;background:#000e;display:none;align-items:center;justify-content:center;padding:16px}
 #lb.on{display:flex}#lb img{max-width:100%;max-height:100%;object-fit:contain;border-radius:8px;box-shadow:0 10px 40px #000}
 #lb button{position:absolute;color:#fff;background:#0008;border-radius:50%;width:44px;height:44px;font-size:24px;display:grid;place-items:center}
@@ -249,6 +255,21 @@ const closeSheet = () => { tok++; $('#ov').style.display = 'none'; $('#sh').inne
 $('#ov').onclick = e => e.target.id === 'ov' && closeSheet();
 document.addEventListener('keydown', e => e.key === 'Escape' && closeSheet());
 
+/* ---------- горизонтальні рядки без повзунка: стрілки + перетягування ---------- */
+function hscroll(el) {
+  if (!el) return; const w = document.createElement('div'); w.className = 'hs'; el.replaceWith(w); w.append(el);
+  const mk = d => { const b = document.createElement('button'); b.type = 'button'; b.className = 'hs-b ' + (d < 0 ? 'l' : 'r'); b.textContent = d < 0 ? '‹' : '›'; b.setAttribute('aria-label', d < 0 ? 'Назад' : 'Далі'); b.onclick = () => el.scrollBy({ left: d * el.clientWidth * .8, behavior: 'smooth' }); return b; };
+  w.append(mk(-1), mk(1));
+  const upd = () => { w.classList.toggle('can-l', el.scrollLeft > 4); w.classList.toggle('can-r', el.scrollLeft + el.clientWidth < el.scrollWidth - 4); };
+  el.addEventListener('scroll', upd, { passive: true }); el.querySelectorAll('img').forEach(i => i.addEventListener('load', upd)); upd(); setTimeout(upd, 300);
+  let down = false, moved = false, sx = 0, sl = 0;
+  el.addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse') return; down = true; moved = false; sx = e.clientX; sl = el.scrollLeft; });
+  window.addEventListener('pointermove', e => { if (!down) return; const dx = e.clientX - sx; if (Math.abs(dx) > 5) moved = true; if (moved) el.scrollLeft = sl - dx; });
+  window.addEventListener('pointerup', () => { down = false; });
+  el.addEventListener('click', e => { if (moved) { e.stopPropagation(); e.preventDefault(); moved = false; } }, true);
+  el.addEventListener('dragstart', e => e.preventDefault());
+}
+
 /* ---------- lightbox ---------- */
 const LB = { l: [], i: 0 };
 const lbShow = () => { $('#lb img').src = LB.l[LB.i]; $('#lb .lk').textContent = `${LB.i + 1} / ${LB.l.length}`; };
@@ -384,13 +405,13 @@ async function openMovie(o) {
   const id = eid(o.type, o.tmdb_id), ex = mine.find(z => z.id === id), th = view === 'lib' && !own() ? lib.entries.find(z => z.id === id) : null, ep = o.type === 'tv' ? 'tv' : 'movie';
   const S = { w: !!ex?.watched, b: !!ex?.libraries?.includes('watchlist'), f: !!ex?.libraries?.includes('favorites'), t: !!me.top4?.some(x => x.id === id), c: !!me.watching?.some(x => x.id === id) };
   sheet(`<div class="bd" id="bd"></div><div class="mh"><img src="${esc(o.poster)}" alt=""><div class="mi"><h2>${esc(o.title)}</h2><p class="meta" id="mm">${esc(o.year)} · ${ep === 'tv' ? 'Серіал' : 'Фільм'}</p>
-<p class="over" id="mo">Завантаження…</p><p class="meta" id="mc"></p><div class="row"><button class="btn" id="tb">▶ Трейлер</button></div><div class="tbx" id="tbx"></div><div id="gal"></div><div id="sim"></div>
+<p class="over" id="mo">Завантаження…</p><p class="meta" id="mc"></p><div class="row"><button class="btn" id="tb">▶ Трейлер</button></div><div class="tbx" id="tbx"></div><div id="gal"></div>
 ${th ? `<div class="box"><h3>Оцінка: ${esc(lib.name)}</h3><p>★ ${esc(th.rating || 'N/A')}</p><p class="over">${esc(th.comment || '')}</p></div>` : ''}
 <div class="box"><h3>Мій запис</h3>
 <div class="togs" id="tg">${[['w', '👁 Подивився'], ['b', '🔖 Хочу подивитись'], ['c', '▶ Дивлюсь зараз'], ['f', '♥ Улюблений'], ['t', '★ У топ-4']].map(([k, n]) => `<button type="button" class="tog ${S[k] ? 'on' : ''}" data-t="${k}">${n}</button>`).join('')}</div>
 <input type="number" id="fr" min="0" max="13" step="0.1" placeholder="Моя оцінка з 10" value="${ex && num(ex.rating) >= 0 ? num(ex.rating) : ''}">
 <textarea id="fc" placeholder="Мій коментар або рецензія">${esc(ex?.comment || '')}</textarea>
-<div class="gap"><button class="btn red" id="fs">Зберегти</button>${ex ? '<button class="btn" id="fd">Видалити</button>' : ''}</div></div></div></div>`);
+<div class="gap"><button class="btn red" id="fs">Зберегти</button>${ex ? '<button class="btn" id="fd">Видалити</button>' : ''}</div></div><div id="sim"></div></div></div>`);
   const t = tok; trk = null;
   $('#tg').onclick = e => {
     const b = e.target.closest('[data-t]'); if (!b) return; const k = b.dataset.t;
@@ -447,11 +468,12 @@ ${th ? `<div class="box"><h3>Оцінка: ${esc(lib.name)}</h3><p>★ ${esc(th.
       const l = G[k].map(x => ({ s: IMG + (k === 'st' ? 'w500' : 'w342') + x.file_path, f: IMG + (k === 'st' ? 'w1280' : 'w780') + x.file_path }));
       $('#gal').innerHTML = `<div class="gal"><div class="gal-tabs">${[['st', 'Кадри'], ['po', 'Постери']].filter(([q]) => G[q].length).map(([q, n]) => `<button type="button" class="tab ${q === k ? 'on' : ''}" data-g="${q}">${n}<span>${G[q].length}</span></button>`).join('')}</div>
 <div class="gal-row ${k}">${l.map((x, i) => `<img loading="lazy" data-gi="${i}" src="${x.s}" alt="">`).join('')}</div></div>`;
+      hscroll($('#gal .gal-row'));
       $('#gal').onclick = e => { const b = e.target.closest('[data-g]'); if (b) return drawG(b.dataset.g); const i = e.target.dataset.gi; if (i !== undefined) lbOpen(l.map(x => x.f), +i); };
     };
     const k0 = G.st.length ? 'st' : G.po.length ? 'po' : ''; if (k0) drawG(k0);
     const sims = (d.similar?.results || []).filter(s => s.poster_path).slice(0, 8);
-    if (sims.length) { $('#sim').innerHTML = `<p class="meta">Схожі</p><div class="simr">${sims.map((s, i) => `<img data-s="${i}" src="${IMG}w185${s.poster_path}" alt="${esc(s.title || s.name)}">`).join('')}</div>`; $('#sim').onclick = e => { const i = e.target.dataset.s; if (i !== undefined) openMovie(mapT(sims[i], ep)); }; }
+    if (sims.length) { $('#sim').innerHTML = `<p class="meta">Схожі</p><div class="simr">${sims.map((s, i) => `<img data-s="${i}" src="${IMG}w185${s.poster_path}" alt="${esc(s.title || s.name)}">`).join('')}</div>`; hscroll($('#sim .simr')); $('#sim').onclick = e => { const i = e.target.dataset.s; if (i !== undefined) openMovie(mapT(sims[i], ep)); }; }
   } catch { if (t === tok) $('#mo').textContent = 'Не вдалося завантажити опис'; }
 }
 
