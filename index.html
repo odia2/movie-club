@@ -88,17 +88,24 @@ textarea{min-height:80px;resize:vertical}label.ck{display:flex;gap:8px;align-ite
 .t4 img{width:100%;height:100%;object-fit:cover;border-radius:8px;display:block}
 .t4 .rm{position:absolute;top:6px;right:6px;width:24px;height:24px;border-radius:50%;background:#000c;color:#fff;display:grid;place-items:center;z-index:5;font-size:14px;line-height:1}
 .t4.e4{border:2px dashed var(--line);display:grid;place-items:center;text-align:center;color:var(--mut);font-size:12px;padding:8px;cursor:default;border-radius:8px}
-.cbubble{position:absolute;top:6px;left:6px;z-index:6;pointer-events:auto}
-.cb-pill{display:flex;align-items:center;gap:4px;padding:3px 7px;background:var(--s1);background:color-mix(in srgb,var(--s1) 90%,transparent);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:999px;font-size:11px;color:var(--tx);box-shadow:0 2px 8px #0008;max-width:85px;transition:.2s cubic-bezier(.16,1,.3,1)}
-.cb-pill span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.cb-ico{color:var(--ac2);font-size:11px;flex:none}
-.cb-pop{position:absolute;top:calc(100% + 6px);left:0;min-width:180px;max-width:240px;background:var(--s1);border:1px solid var(--line);border-radius:10px;padding:10px 12px;box-shadow:0 12px 30px #000c,0 0 0 1px var(--ac);opacity:0;visibility:hidden;transform:translateY(-6px) scale(.96);transition:.22s cubic-bezier(.16,1,.3,1);z-index:30;pointer-events:none}
-.cb-pop:before{content:'';position:absolute;bottom:100%;left:12px;border:5px solid transparent;border-bottom-color:var(--ac)}
-.t4:hover .cb-pop,.cbubble:hover .cb-pop{opacity:1;visibility:visible;transform:translateY(0) scale(1);pointer-events:auto}
-.t4:hover .cb-pill{border-color:var(--ac);background:var(--s2)}
-.cb-top{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;margin-bottom:4px;color:var(--tx)}
-.cb-rt{color:var(--star)}
-.cb-text{font-size:12px;line-height:1.45;color:var(--tx2);white-space:pre-wrap;word-break:break-word;max-height:150px;overflow-y:auto}
+.t4{overflow:hidden}
+.t4 .rm{transition:.15s;box-shadow:0 2px 6px #0007}.t4 .rm:hover{background:#e11d48}
+/* --- коментар: прозора плашка внизу постера, на hover розкривається --- */
+.cbubble{position:absolute;left:0;right:0;bottom:0;z-index:4;padding:22px 9px 8px;color:var(--tx);cursor:pointer;
+  background:linear-gradient(to top,color-mix(in srgb,var(--bg) 94%,transparent) 0%,color-mix(in srgb,var(--bg) 82%,transparent) 55%,transparent 100%);
+  transition:background .3s ease,padding .3s ease}
+.cb-head{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;line-height:1.25;max-height:0;opacity:0;overflow:hidden;transition:max-height .3s ease,opacity .25s ease,margin .3s ease}
+.cb-rt{color:var(--star);flex:none;display:inline-flex;align-items:center;gap:3px;padding:1px 7px;border-radius:999px;background:var(--s2);border:1px solid var(--line)}
+.cb-t{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--tx)}
+.cb-text{font-size:12px;line-height:1.4;color:var(--tx2);white-space:pre-wrap;word-break:break-word;max-height:2.8em;overflow:hidden;
+  -webkit-mask-image:linear-gradient(#000 55%,transparent);mask-image:linear-gradient(#000 55%,transparent);
+  transition:max-height .35s cubic-bezier(.16,1,.3,1)}
+.t4:hover .cbubble,.t4:focus-visible .cbubble{padding-top:34px;background:linear-gradient(to top,color-mix(in srgb,var(--s1) 97%,transparent) 0%,color-mix(in srgb,var(--s1) 93%,transparent) 78%,transparent 100%);backdrop-filter:blur(6px)}
+.t4:hover .cb-head,.t4:focus-visible .cb-head{max-height:26px;opacity:1;margin-bottom:6px}
+.t4:hover .cb-text,.t4:focus-visible .cb-text{max-height:140px;overflow-y:auto;-webkit-mask-image:none;mask-image:none;scrollbar-width:thin;scrollbar-color:var(--ac) transparent}
+.cbubble.nc{padding:0;background:none}
+.t4:hover .cbubble.nc,.t4:focus-visible .cbubble.nc{padding:30px 9px 8px}
+@media(max-width:640px){.top4{grid-template-columns:repeat(2,1fr)}}
 .rv{display:flex;gap:14px;background:var(--s1);border-radius:8px;padding:12px;margin-bottom:10px;cursor:pointer}.rv img{width:64px;height:96px;object-fit:cover;border-radius:5px;flex:none}
 .rv p{color:var(--tx2);font-size:14px;line-height:1.5;margin-top:6px;white-space:pre-wrap}
 .logo{cursor:pointer}
@@ -184,6 +191,8 @@ const DICT = {
 'Усі':['Все','All'],'Питання':['Вопрос','Question'],'Порада':['Совет','Tip'],'Рецензія':['Рецензия','Review'],'Обговорення':['Обсуждение','Discussion'],'+ Новий пост':['+ Новый пост','+ New post'],
 'Новий пост':['Новый пост','New post'],'Опублікувати':['Опубликовать','Publish'],'Коментарі':['Комментарии','Comments'],'Надіслати':['Отправить','Send'],'Видалити пост':['Удалить пост','Delete post'],
 '· адмін':['· админ','· admin'],'· учасник':['· участник','· member'],'· очікує підтвердження':['· ждёт подтверждения','· pending approval'],'Підтвердити':['Подтвердить','Approve'],'Заблокувати':['Заблокировать','Block'],
+'Познач переглянутий фільм кнопкою «★ У топ-4»':['Отметь просмотренный фильм кнопкой «★ В топ-4»','Mark a watched movie with \"★ Add to top 4\"'],'Учасник приховав свій Топ-4.':['Участник скрыл свой Топ-4.','User hid their Top 4.'],'Учасник приховав рецензії.':['Участник скрыл рецензии.','User hid their reviews.'],
+'У топ-4 можна додати лише переглянутий фільм':['В топ-4 можно добавить только просмотренный фильм','Only watched movies can be added to the top 4'],'У топ-4 вже 4 фільми. Прибери один у профілі':['В топ-4 уже 4 фильма. Убери один в профиле','Top 4 is full. Remove one in your profile'],'У «Дивлюсь зараз» вже 4 фільми. Прибери один у профілі':['В «Сейчас смотрю» уже 4 фильма. Убери один в профиле','\"Watching now\" is full. Remove one in your profile'],
 'Топ-4 улюблених':['Топ-4 любимых','Top 4 favorites'],'Дивлюсь зараз':['Сейчас смотрю','Watching now'],'▶ Дивлюсь зараз':['▶ Сейчас смотрю','▶ Watching now'],
 'У «Дивлюсь зараз» вже 4 фільми':['В «Сейчас смотрю» уже 4 фильма','Already 4 items in "Watching now"'],
 'Познач фільм кнопкою «▶ Дивлюсь зараз»':['Отметь фильм кнопкой «▶ Сейчас смотрю»','Mark movie with "▶ Watching now"'],
@@ -485,13 +494,9 @@ const bubbleHtml = (item, entries) => {
   const r = en.rating || item.rating || '';
   const rt = r && r !== 'N/A' && num(r) >= 0 ? r.split('/')[0] : '';
   if (!cmt && !rt) return '';
-  const prev = cmt ? cmt.slice(0, 8) : (rt ? `★ ${rt}` : '');
-  return `<div class="cbubble" onclick="event.stopPropagation()">
-    <div class="cb-pill"><span class="cb-ico">💬</span><span>${esc(prev)}…</span></div>
-    <div class="cb-pop">
-      <div class="cb-top">${rt ? `<span class="cb-rt">★ ${esc(rt)}</span>` : ''}<span class="cb-t">${esc(item.title)}</span></div>
-      ${cmt ? `<div class="cb-text">${esc(cmt)}</div>` : ''}
-    </div>
+  return `<div class="cbubble ${cmt ? '' : 'nc'}">
+    <div class="cb-head">${rt ? `<span class="cb-rt">★ ${esc(rt)}</span>` : ''}<span class="cb-t">${esc(item.title)}</span></div>
+    ${cmt ? `<div class="cb-text">${esc(cmt)}</div>` : ''}
   </div>`;
 };
 async function dropTop(id) { if (!me.top4?.some(x => x.id === id)) return; const top = me.top4.filter(x => x.id !== id); await updateDoc(doc(db, 'users', me.uid), { top4: top }); me.top4 = top; }
@@ -510,7 +515,7 @@ function rProf() {
     if (!it) return `<div class="t4 e4">${mp ? (typeKey === 'w' ? 'Познач фільм кнопкою «▶ Дивлюсь зараз»' : 'Познач переглянутий фільм кнопкою «★ У топ-4»') : '—'}</div>`;
     const rmAttr = typeKey === 'w' ? `data-rm-w="${i}"` : `data-rm="${i}"`;
     const openAttr = typeKey === 'w' ? `data-w4="${i}"` : `data-t4="${i}"`;
-    return `<div class="t4" ${openAttr}>
+    return `<div class="t4" tabindex="0" ${openAttr}>
       <img src="${esc(it.poster)}" alt="${esc(it.title)}">
       ${bubbleHtml(it, entries)}
       ${mp ? `<span class="rm" ${rmAttr}>×</span>` : ''}
