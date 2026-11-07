@@ -10,7 +10,9 @@ service cloud.firestore {
       allow create: if request.auth.uid == uid
         && request.resource.data.approved == isAdmin()
         && request.resource.data.role == (isAdmin() ? 'admin' : 'member');
-      allow update: if isAdmin();
+      allow update: if isAdmin() ||
+  (approved() && request.auth.uid == uid &&
+   !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role','approved']));
       match /entries/{entry} {
         allow read: if approved();
         allow write: if approved() && request.auth.uid == uid;
