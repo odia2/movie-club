@@ -19,7 +19,11 @@ service cloud.firestore {
     match /posts/{post} {
       allow read: if approved();
       allow create: if approved() && request.resource.data.uid == request.auth.uid;
-      allow update: if approved();
+      allow update: if approved() && (
+  isAdmin() ||
+  resource.data.uid == request.auth.uid ||
+  request.resource.data.diff(resource.data).affectedKeys().hasOnly(['up']) // лайки
+);
       allow delete: if approved() && (isAdmin() || resource.data.uid == request.auth.uid);
       match /comments/{c} {
         allow read: if approved();
