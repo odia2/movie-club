@@ -409,12 +409,15 @@ function rMem() {
 <div class="nm" ${u.approved ? `data-prof="${u.uid}"` : ''}>${esc(u.name)} <span class="meta" style="margin:0">${u.role === 'admin' ? '· адмін' : u.approved ? '· учасник' : '· очікує підтвердження'}</span></div>
 ${isAd() && u.uid !== me.uid ? `<button class="btn ${u.approved ? '' : 'red'}" data-ap="${u.uid}" data-v="${u.approved ? 0 : 1}">${u.approved ? 'Заблокувати' : 'Підтвердити'}</button>` : ''}</div>`).join('');
 }
-async function setApproved(uid, v) { try { await updateDoc(doc(db, 'users', uid), { approved: v }); users.find(u => u.uid === uid).approved = v; render(); } catch (e) { toast('Помилка: ' + e.message); } }
-async function viewLib(uid) {
-  const u = uid === me.uid ? me : users.find(x => x.uid === uid) || prof?.u;
-  let en = uid === me.uid ? mine : prof?.u.uid === uid ? prof.entries : await loadEntries(uid);
-  const hid = uid !== me.uid && u.showWatched === false; if (hid) en = en.filter(e => !e.watched);
-  lib = { uid, name: u.name, entries: en, hid }; filter = 'all'; go('lib');
+async function setApproved(uid, v) { 
+  try { 
+    await updateDoc(doc(db, 'users', uid), { approved: v }); 
+    users.find(u => u.uid === uid).approved = v; 
+    render(); 
+    toast(v ? 'Користувача підтверджено' : 'Користувача заблоковано');
+  } catch (e) { 
+    toast('Помилка: ' + e.message); 
+  } 
 }
 async function viewProf(uid) {
   const u = uid === me.uid ? me : users.find(x => x.uid === uid); let banner = '';
