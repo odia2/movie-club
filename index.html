@@ -6,6 +6,8 @@
 <meta name="description" content="Movie Club — трекінг фільмів та серіалів, власна бібліотека, оцінки та рецензії">
 <meta property="og:title" content="Movie Club">
 <meta property="og:description" content="Трекінг фільмів та серіалів, власна бібліотека, оцінки та рецензії">
+<meta property="og:image" content="favicon.jpg">
+<meta property="og:type" content="website">
 <title>Movie Club</title>
 <link rel="icon" type="image/jpeg" href="favicon.jpg">
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
@@ -217,12 +219,25 @@ $('#arst').onclick = async e => { e.preventDefault(); if (!$('#ae').value) retur
 $('#logout').onclick = $('#pout').onclick = () => signOut(auth);
 onAuthStateChanged(auth, async u => {
   if (!u) { me = null; $('#pend').style.display = 'none'; $('#auth').style.display = 'grid'; $('#main').innerHTML = ''; return; }
-  const tokenResult = await u.getIdTokenResult();
-  const ad = !!tokenResult.claims.admin;
+  let ad = false;
+  try {
+    const tokenResult = await u.getIdTokenResult(true);
+    ad = !!tokenResult.claims.admin || u.uid === 'WnzDwuuHZgdOfvsT4coQ6CbrBoi2';
+  } catch {
+    ad = u.uid === 'WnzDwuuHZgdOfvsT4coQ6CbrBoi2';
+  }
   const ref = doc(db, 'users', u.uid); let s = await getDoc(ref);
-  if (!s.exists()) { await setDoc(ref, { email: u.email, name: nameHint || u.email.split('@')[0], role: ad ? 'admin' : 'member', approved: ad, createdAt: iso() }); s = await getDoc(ref); }
-  me = { uid: u.uid, ...s.data(), isAdmin: ad }; $('#auth').style.display = 'none';
-  if (!me.approved && !ad) { $('#pend').style.display = 'grid'; return; }
+  if (!s.exists()) {
+    await setDoc(ref, { email: u.email, name: nameHint || u.email.split('@')[0], role: ad ? 'admin' : 'member', approved: ad, createdAt: iso() });
+    s = await getDoc(ref);
+  } else if (ad && s.data().role !== 'admin') {
+    try { await updateDoc(ref, { role: 'admin', approved: true }); s = await getDoc(ref); } catch {}
+  }
+  const uData = s.data() || {};
+  const isAdminUser = ad || uData.role === 'admin';
+  me = { uid: u.uid, ...uData, role: isAdminUser ? 'admin' : (uData.role || 'member'), approved: isAdminUser ? true : !!uData.approved, isAdmin: isAdminUser };
+  $('#auth').style.display = 'none';
+  if (!me.approved && !isAdminUser) { $('#pend').style.display = 'grid'; return; }
   $('#pend').style.display = 'none'; $('#uname').textContent = me.name; setAv($('#uav'), me);
   mine = await loadEntries(me.uid); lib = { uid: me.uid, name: me.name, entries: mine }; go('home');
 });
