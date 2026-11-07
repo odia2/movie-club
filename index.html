@@ -110,9 +110,9 @@ textarea{min-height:80px;resize:vertical}label.ck{display:flex;gap:8px;align-ite
 .gal{margin:14px 0 4px}.gal-tabs{display:flex;gap:8px;align-items:center;margin-bottom:8px}
 .gal-tabs .tab{padding:5px 12px;font-size:13px}
 .gal-row{display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;scroll-snap-type:x proximity}
-.gal-row img{height:120px;border-radius:6px;cursor:zoom-in;flex:none;scroll-snap-align:start;background:var(--s2);transition:transform .15s,box-shadow .15s}
+.gal-row img{height:150px;border-radius:6px;cursor:zoom-in;flex:none;scroll-snap-align:start;background:var(--s2);transition:transform .15s,box-shadow .15s}
 .gal-row img:hover{transform:translateY(-2px);box-shadow:0 6px 16px #0007}
-.gal-row.po img{height:150px}
+.gal-row.po img{height:190px}
 #lb{position:fixed;inset:0;z-index:300;background:#000e;display:none;align-items:center;justify-content:center;padding:16px}
 #lb.on{display:flex}#lb img{max-width:100%;max-height:100%;object-fit:contain;border-radius:8px;box-shadow:0 10px 40px #000}
 #lb button{position:absolute;color:#fff;background:#0008;border-radius:50%;width:44px;height:44px;font-size:24px;display:grid;place-items:center}
@@ -384,7 +384,7 @@ async function openMovie(o) {
   const id = eid(o.type, o.tmdb_id), ex = mine.find(z => z.id === id), th = view === 'lib' && !own() ? lib.entries.find(z => z.id === id) : null, ep = o.type === 'tv' ? 'tv' : 'movie';
   const S = { w: !!ex?.watched, b: !!ex?.libraries?.includes('watchlist'), f: !!ex?.libraries?.includes('favorites'), t: !!me.top4?.some(x => x.id === id), c: !!me.watching?.some(x => x.id === id) };
   sheet(`<div class="bd" id="bd"></div><div class="mh"><img src="${esc(o.poster)}" alt=""><div class="mi"><h2>${esc(o.title)}</h2><p class="meta" id="mm">${esc(o.year)} · ${ep === 'tv' ? 'Серіал' : 'Фільм'}</p>
-<p class="over" id="mo">Завантаження…</p><p class="meta" id="mc"></p><div class="row"><button class="btn" id="tb">▶ Трейлер</button></div><div class="tbx" id="tbx"></div><div id="sim"></div><div id="gal"></div>
+<p class="over" id="mo">Завантаження…</p><p class="meta" id="mc"></p><div class="row"><button class="btn" id="tb">▶ Трейлер</button></div><div class="tbx" id="tbx"></div><div id="gal"></div><div id="sim"></div>
 ${th ? `<div class="box"><h3>Оцінка: ${esc(lib.name)}</h3><p>★ ${esc(th.rating || 'N/A')}</p><p class="over">${esc(th.comment || '')}</p></div>` : ''}
 <div class="box"><h3>Мій запис</h3>
 <div class="togs" id="tg">${[['w', '👁 Подивився'], ['b', '🔖 Хочу подивитись'], ['c', '▶ Дивлюсь зараз'], ['f', '♥ Улюблений'], ['t', '★ У топ-4']].map(([k, n]) => `<button type="button" class="tog ${S[k] ? 'on' : ''}" data-t="${k}">${n}</button>`).join('')}</div>
@@ -444,7 +444,7 @@ ${th ? `<div class="box"><h3>Оцінка: ${esc(lib.name)}</h3><p>★ ${esc(th.
     const pick = a => (a || []).filter(x => x.file_path).sort((x, y) => (y.vote_average || 0) - (x.vote_average || 0)).slice(0, 14);
     const G = { st: pick(d.images?.backdrops), po: pick(d.images?.posters) };
     const drawG = k => {
-      const l = G[k].map(x => ({ s: IMG + (k === 'st' ? 'w300' : 'w185') + x.file_path, f: IMG + (k === 'st' ? 'w1280' : 'w780') + x.file_path }));
+      const l = G[k].map(x => ({ s: IMG + (k === 'st' ? 'w500' : 'w342') + x.file_path, f: IMG + (k === 'st' ? 'w1280' : 'w780') + x.file_path }));
       $('#gal').innerHTML = `<div class="gal"><div class="gal-tabs">${[['st', 'Кадри'], ['po', 'Постери']].filter(([q]) => G[q].length).map(([q, n]) => `<button type="button" class="tab ${q === k ? 'on' : ''}" data-g="${q}">${n}<span>${G[q].length}</span></button>`).join('')}</div>
 <div class="gal-row ${k}">${l.map((x, i) => `<img loading="lazy" data-gi="${i}" src="${x.s}" alt="">`).join('')}</div></div>`;
       $('#gal').onclick = e => { const b = e.target.closest('[data-g]'); if (b) return drawG(b.dataset.g); const i = e.target.dataset.gi; if (i !== undefined) lbOpen(l.map(x => x.f), +i); };
