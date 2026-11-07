@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Movie Club — трекінг фільмів та серіалів, власна бібліотека, оцінки та рецензії">
+<meta property="og:title" content="Movie Club">
+<meta property="og:description" content="Трекінг фільмів та серіалів, власна бібліотека, оцінки та рецензії">
 <title>Movie Club</title>
 <link rel="icon" type="image/jpeg" href="favicon.jpg">
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
@@ -136,7 +139,7 @@ const app = initializeApp({
   storageBucket: "wathed-movies.firebasestorage.app", messagingSenderId: "54824906865", appId: "1:54824906865:web:58f419a6824aae41f6abd0", measurementId: "G-K153BLFVSW"
 });
 const auth = getAuth(app), db = getFirestore(app);
-const TMDB = "e58d0bd8f6cdc8a3a80354d83e044fe4", ADMIN = "bogdan17261726@gmail.com", IMG = "https://image.tmdb.org/t/p/";
+const TMDB = "e58d0bd8f6cdc8a3a80354d83e044fe4", IMG = "https://image.tmdb.org/t/p/";
 const $ = s => document.querySelector(s), iso = () => new Date().toISOString();
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const tm = (p, q = '') => fetch(`https://api.themoviedb.org/3/${p}?api_key=${TMDB}&language=${TL[cfg.lang]}${q}`).then(r => r.json());
@@ -147,7 +150,7 @@ const ago = t => { const m = (Date.now() - new Date(t)) / 6e4; return m < 1 ? '�
 const ACC = { violet: ['#8b5cf6', '#b39bfa'], red: ['#e5484d', '#ff8f92'], blue: ['#3b82f6', '#8ab8ff'], green: ['#22c55e', '#7be49d'], pink: ['#ec4899', '#f59ac8'] };
 let cfg = { lang: 'uk', theme: 'dark', acc: 'violet', size: 'normal' };
 try { Object.assign(cfg, JSON.parse(localStorage.getItem('mc') || '{}')); } catch {}
-const TL = { uk: 'ru-RU', ru: 'ru-RU', en: 'en-US' };
+const TL = { uk: 'uk-UA', ru: 'ru-RU', en: 'en-US' };
 function applySettings() {
   const r = document.documentElement, a = ACC[cfg.acc] || ACC.violet;
   r.dataset.theme = cfg.theme; r.lang = cfg.lang; r.style.setProperty('--ac', a[0]); r.style.setProperty('--ac2', cfg.theme === 'light' ? a[0] : a[1]);
@@ -193,7 +196,7 @@ const inLib = (e, l) => l === 'all' || (l === 'watched' ? e.watched : l === 'mov
 let me, mine = [], lib = {}, view = 'lib', filter = 'all', sort = 'new', posts = [], tag = 'Усі', users = [], disc = [], dsrc = DSRC[0][0], tok = 0, trk = null, signup = false, nameHint = '', prof = null, home = [];
 const RSS_KEY = ''; // необов'язково: безкоштовний ключ з rss2json.com, якщо новини не вантажаться
 const HOME = [['trending/all/week', 'Топ-15 тижня', 15, 1], ['movie/now_playing', 'Зараз у кіно', 12], ['movie/upcoming', 'Скоро в кіно', 12], ['tv/popular', 'Популярні серіали', 12]];
-const isAd = () => me?.role === 'admin', own = () => lib.uid === me.uid;
+const isAd = () => me?.role === 'admin' || me?.isAdmin === true, own = () => lib.uid === me.uid;
 let tt; const toast = t => { const e = $('#toast'); e.textContent = t; e.classList.add('show'); clearTimeout(tt); tt = setTimeout(() => e.classList.remove('show'), 2400); };
 const sheet = h => { tok++; $('#sh').innerHTML = `<button class="x" id="mx">×</button>` + h; $('#ov').style.display = 'block'; document.body.style.overflow = 'hidden'; $('#mx').onclick = closeSheet; };
 const closeSheet = () => { tok++; $('#ov').style.display = 'none'; $('#sh').innerHTML = ''; document.body.style.overflow = ''; };
@@ -214,10 +217,12 @@ $('#arst').onclick = async e => { e.preventDefault(); if (!$('#ae').value) retur
 $('#logout').onclick = $('#pout').onclick = () => signOut(auth);
 onAuthStateChanged(auth, async u => {
   if (!u) { me = null; $('#pend').style.display = 'none'; $('#auth').style.display = 'grid'; $('#main').innerHTML = ''; return; }
+  const tokenResult = await u.getIdTokenResult();
+  const ad = !!tokenResult.claims.admin;
   const ref = doc(db, 'users', u.uid); let s = await getDoc(ref);
-  if (!s.exists()) { const ad = u.email === ADMIN; await setDoc(ref, { email: u.email, name: nameHint || u.email.split('@')[0], role: ad ? 'admin' : 'member', approved: ad, createdAt: iso() }); s = await getDoc(ref); }
-  me = { uid: u.uid, ...s.data() }; $('#auth').style.display = 'none';
-  if (!me.approved) { $('#pend').style.display = 'grid'; return; }
+  if (!s.exists()) { await setDoc(ref, { email: u.email, name: nameHint || u.email.split('@')[0], role: ad ? 'admin' : 'member', approved: ad, createdAt: iso() }); s = await getDoc(ref); }
+  me = { uid: u.uid, ...s.data(), isAdmin: ad }; $('#auth').style.display = 'none';
+  if (!me.approved && !ad) { $('#pend').style.display = 'grid'; return; }
   $('#pend').style.display = 'none'; $('#uname').textContent = me.name; setAv($('#uav'), me);
   mine = await loadEntries(me.uid); lib = { uid: me.uid, name: me.name, entries: mine }; go('home');
 });
@@ -293,7 +298,7 @@ async function loadNews() {
   const box = $('#news'); if (!box || view !== 'home') return;
   const d = x => new Date(String(x).replace(' ', 'T') + 'Z');
   const items = rs.flatMap(r => r?.status === 'ok' ? r.items.map(i => ({ ...i, src: r.feed.title })) : []).filter(i => /^https?:/.test(i.link)).sort((a, b) => d(b.pubDate) - d(a.pubDate)).slice(0, 8);
-  box.innerHTML = items.length ? items.map(n => `<a class="news" href="${esc(n.link)}" target="_blank" rel="noopener">${n.thumbnail ? `<img src="${esc(n.thumbnail)}" alt="">` : ''}<div><b>${esc(n.title)}</b><p class="meta">${esc(n.src)} · ${ago(d(n.pubDate).toISOString())}</p></div></a>`).join('') : '<p class="meta">Новини тимчасово недоступні.</p>';
+  box.innerHTML = items.length ? items.map(n => `<a class="news" href="${esc(n.link)}" target="_blank" rel="noopener">${n.thumbnail ? `<img src="${esc(n.thumbnail)}" alt="">` : ''}<div><b>${esc(n.title)}</b><p class="meta">${esc(n.src)} · ${esc(ago(d(n.pubDate).toISOString()))}</p></div></a>`).join('') : '<p class="meta">Новини тимчасово недоступні.</p>';
 }
 
 /* ---------- discover ---------- */
